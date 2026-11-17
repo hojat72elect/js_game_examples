@@ -1,1 +1,0 @@
-console.log("Hello via Hojat and bun!");

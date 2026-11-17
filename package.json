@@ -1,6 +1,5 @@
 {
   "name": "js_game_examples",
-  "module": "index.ts",
   "type": "module",
   "private": true,
   "devDependencies": {
