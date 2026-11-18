@@ -28,7 +28,7 @@ LJS.setTilesPixelated(false);
 const sceneCount = 12;
 const startScene = 0;
 export let spriteAtlas, groundObject, mouseJoint, repeatSpawnTimer = new LJS.Timer;
-const sound_click = new LJS.Sound([.2, .1, , , , .01, , , , , , , , , , , , , , , -500]);
+const sound_click = new LJS.Sound([.2, .1, undefined, undefined, undefined, .01, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, -500]);
 
 ///////////////////////////////////////////////////////////////////////////////
 // each demo scene is a scene for the scene system, setScene destroys the old
@@ -129,7 +129,7 @@ function gameUpdatePost() {
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameRender() {
-    if (Scenes.scene == 5) {
+    if (Scenes.scene === 5) {
         // raycast test
         const count = 100;
         const distance = 10;
@@ -156,13 +156,13 @@ function gameRenderPost() {
     const pos = vec2(LJS.mainCanvasSize.x / 2, 50);
     drawText('LittleJS Box2D Demo', 65, 70);
     drawText(Scenes.sceneName, 50, 100);
-    if (Scenes.scene == 0) {
+    if (Scenes.scene === 0) {
         drawText('Mouse Left = Grab');
         drawText('Mouse Middle or Z = Spawn');
         drawText('Mouse Right or X = Explode');
         drawText('Arrows Up/Down = Change Scene');
     }
-    if (Scenes.scene == 3) {
+    if (Scenes.scene === 3) {
         drawText('Right = Accelerate');
         drawText('Left = Reverse');
     }

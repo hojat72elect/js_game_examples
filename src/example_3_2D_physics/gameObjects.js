@@ -418,8 +418,8 @@ export class RagdollObject extends LJS.Box2dObject {
         const torsoWidth = 1.2 * scale;
         const torsoHeight = 2 * scale;
         const limbWidth = .4 * scale;
-        const upperArmLen = 1 * scale;
-        const lowerArmLen = 1 * scale;
+        const upperArmLen = scale;
+        const lowerArmLen = scale;
         const upperLegLen = 1.1 * scale;
         const lowerLegLen = 1.1 * scale;
 
@@ -480,7 +480,7 @@ export class RagdollObject extends LJS.Box2dObject {
 ///////////////////////////////////////////////////////////////////////////////
 // Effects
 
-const sound_explosion = new LJS.Sound([.5, .2, 72, .01, .01, .2, 4, , , , , , , 1, , .5, .1, .5, .02]);
+const sound_explosion = new LJS.Sound([.5, .2, 72, .01, .01, .2, 4,undefined , undefined,undefined , undefined,undefined , undefined, 1,undefined , .5, .1, .5, .02]);
 
 export function explosion(pos, radius = 3, strength = 300) {
     sound_explosion.play(pos);
