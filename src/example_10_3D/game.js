@@ -228,7 +228,7 @@ function gameRender() {
 function gameRenderPost() {
     // 2D hud text always renders on top
     const pos = vec2(LJS.mainCanvasSize.x / 2, 45);
-    const done = coinsCollected == coinsTotal ? ' — You got them all!' : '';
+    const done = coinsCollected === coinsTotal ? ' — You got them all!' : '';
     LJS.drawTextScreen(`Coins: ${coinsCollected} / ${coinsTotal}${done}`, pos, 35);
     LJS.drawTextScreen('Arrows/WASD run — Space jump', pos.add(vec2(0, 35)), 20);
 }
