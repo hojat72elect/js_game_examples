@@ -8,6 +8,56 @@
 'use strict';
 
 // allow html input controls
+import {particleEffectBehaviors} from "littlejsengine";
+import {setInputPreventDefault} from "littlejsengine";
+import {setTilesPixelated} from "littlejsengine";
+import {Timer} from "littlejsengine";
+import {particleEffectsBuiltIn} from "littlejsengine";
+import {particleEffectsGet} from "littlejsengine";
+import {particleEffectGroups} from "littlejsengine";
+import {particleEffectSettings} from "littlejsengine";
+import {isNumber} from "littlejsengine";
+import {clamp} from "littlejsengine";
+import {round} from "littlejsengine";
+import {Color} from "littlejsengine";
+import {particleEffect3D} from "littlejsengine";
+import {vec3} from "littlejsengine";
+import {particleEffect} from "littlejsengine";
+import {vec2} from "littlejsengine";
+import {CameraControl3D} from "littlejsengine";
+import {HeightMap} from "littlejsengine";
+import {hsl} from "littlejsengine";
+import {particleEffectRecolor} from "littlejsengine";
+import {particleEffectApply} from "littlejsengine";
+import {particleEffectApply3D} from "littlejsengine";
+import {TileCollisionLayer} from "littlejsengine";
+import {tile} from "littlejsengine";
+import {min} from "littlejsengine";
+import {particleEffectsText} from "littlejsengine";
+import {particleEffectsParse} from "littlejsengine";
+import {setCanvasMaxSize} from "littlejsengine";
+import {max} from "littlejsengine";
+import {setCameraScale} from "littlejsengine";
+import {setPaused} from "littlejsengine";
+import {paused} from "littlejsengine";
+import {setCanvasClearColor} from "littlejsengine";
+import {tilesPixelated} from "littlejsengine";
+import {textureInfos} from "littlejsengine";
+import {particleEffectSanitize} from "littlejsengine";
+import {floor} from "littlejsengine";
+import {TextureInfo} from "littlejsengine";
+import {sign} from "littlejsengine";
+import {mouseWheel} from "littlejsengine";
+import {cameraScale} from "littlejsengine";
+import {drawRect} from "littlejsengine";
+import {engineInit} from "littlejsengine";
+import {Render3DPlugin} from "littlejsengine";
+import {setGravity} from "littlejsengine";
+import {render3D} from "littlejsengine";
+import {mousePos} from "littlejsengine";
+import {particleEffectShapes} from "littlejsengine";
+import {particleEffectShapeTile} from "littlejsengine";
+
 setInputPreventDefault(false);
 
 const storageKey = 'particles_library';
@@ -426,7 +476,7 @@ function setView3D(on) {
 function applyPreview() {
     const {hue, saturation} = previewOptions;
     const apply = view3D ? particleEffectApply3D : particleEffectApply;
-    apply(emitter, hue || saturation != 1 ?
+    apply(emitter, hue || saturation !== 1 ?
         particleEffectRecolor(effect, hue, saturation) : effect);
 }
 
@@ -607,7 +657,7 @@ function setupLibraryBar() {
     $('buttonClear').onclick = () => {
         // Save Library first keeps them, Add Presets brings the built in back
         const count = library.length;
-        if (!confirm(`Delete all ${count} effect${count == 1 ? '' : 's'}?`))
+        if (!confirm(`Delete all ${count} effect${count === 1 ? '' : 's'}?`))
             return;
         library = [particleEffectSanitize({name: 'New Effect'})];
         selectEffect(0);

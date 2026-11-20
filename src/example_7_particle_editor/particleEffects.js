@@ -8,6 +8,17 @@
 'use strict';
 
 // the plugin's behavior by name
+import {particleEffectBehaviors} from "littlejsengine";
+import {particleEffectsBuiltIn} from "littlejsengine";
+import {particleEffectSanitize} from "littlejsengine";
+import {particleEffectsGet} from "littlejsengine";
+import {particleEffectRecolor} from "littlejsengine";
+import {textureInfos} from "littlejsengine";
+import {floor} from "littlejsengine";
+import {PI} from "littlejsengine";
+import {Color} from "littlejsengine";
+import {particleEffectSettings} from "littlejsengine";
+
 const effectBehavior = (name) =>
     particleEffectBehaviors.find(b => b.name === name);
 
@@ -87,7 +98,7 @@ function effectCallCode(effect, options, is3D) {
 // and rounded, which changes nothing that can be seen
 function effectEmitterCode(effect, options) {
     const {hue, saturation} = options;
-    if (hue || saturation != 1)
+    if (hue || saturation !== 1)
         effect = particleEffectRecolor(effect, hue, saturation);
     const s = effect.settings;
     const value = (name) => s[name] === PI ? 'PI' : String(s[name]);
@@ -129,7 +140,7 @@ function effectEmitterCode(effect, options) {
     for (const x of particleEffectSettings)
         if (x.extra && (s[x.name] !== x.value || always.includes(x.name)))
             code += `emitter.${x.name} = ${value(x.name)};\n`;
-    if (options.scale != 1)
+    if (options.scale !== 1)
         code += `emitter.scale = ${effectNumber(options.scale)};\n`;
 
     // behaviors, each the plugin's own push written out
