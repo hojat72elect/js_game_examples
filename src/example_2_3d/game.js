@@ -12,6 +12,54 @@
 'use strict';
 
 // each tile in tiles.png has a 1 pixel border, which stops texture bleeding
+import {setTileDefaultPadding} from "littlejsengine";
+import {Sound} from "littlejsengine";
+import {RandomGenerator} from "littlejsengine";
+import {EngineObject3D} from "littlejsengine";
+import {buildSphere} from "littlejsengine";
+import {render3D} from "littlejsengine";
+import {min} from "littlejsengine";
+import {max} from "littlejsengine";
+import {vec3} from "littlejsengine";
+import {sin} from "littlejsengine";
+import {time} from "littlejsengine";
+import {ParticleEmitter3D} from "littlejsengine";
+import {Light3D} from "littlejsengine";
+import {PI} from "littlejsengine";
+import {WHITE} from "littlejsengine";
+import {CLEAR_WHITE} from "littlejsengine";
+import {tile} from "littlejsengine";
+import {Timer} from "littlejsengine";
+import {hsl} from "littlejsengine";
+import {Trail3D} from "littlejsengine";
+import {vec2} from "littlejsengine";
+import {keyDirection} from "littlejsengine";
+import {clamp} from "littlejsengine";
+import {keyWasPressed} from "littlejsengine";
+import {round} from "littlejsengine";
+import {noise2D} from "littlejsengine";
+import {hypot} from "littlejsengine";
+import {HeightMap} from "littlejsengine";
+import {engineObjectsDestroy} from "littlejsengine";
+import {level3DLoad} from "littlejsengine";
+import {ThirdPersonCamera3D} from "littlejsengine";
+import {Render3DPlugin} from "littlejsengine";
+import {postProcessBloom} from "littlejsengine";
+import {DirectionalLight3D} from "littlejsengine";
+import {LensFlare3D} from "littlejsengine";
+import {Mesh} from "littlejsengine";
+import {buildCylinder} from "littlejsengine";
+import {buildCone} from "littlejsengine";
+import {level3DAddMesh} from "littlejsengine";
+import {level3DAddType} from "littlejsengine";
+import {fetchJSON} from "littlejsengine";
+import {buildText3D} from "littlejsengine";
+import {levelEditor} from "littlejsengine";
+import {FirstPersonCamera3D} from "littlejsengine";
+import {mainCanvasSize} from "littlejsengine";
+import {drawTextScreen} from "littlejsengine";
+import {engineInit} from "littlejsengine";
+
 setTileDefaultPadding(1);
 
 const terrainSize = 600, terrainHeight = 24;
@@ -308,5 +356,4 @@ function gameRenderPost() {
     drawTextScreen(text, pos, 30, WHITE, 4);
 }
 
-engineInit(gameInit, gameUpdate, gameUpdatePost, undefined, gameRenderPost,
-    ['tiles.png']);
+engineInit(gameInit, gameUpdate, gameUpdatePost, undefined, gameRenderPost, ['tiles.png']);
