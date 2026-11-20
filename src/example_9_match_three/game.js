@@ -8,8 +8,7 @@
 
 'use strict';
 
-// import LittleJS module
-import * as LJS from '../../node_modules/littlejsengine/dist/littlejs.esm.js';
+import * as LJS from "littlejsengine";
 
 const {vec2, hsl, tile} = LJS;
 
@@ -18,17 +17,17 @@ const {vec2, hsl, tile} = LJS;
 LJS.setCanvasPixelated(false);
 LJS.setTilesPixelated(false);
 
-const fallTime = .2;
-const swapTime = .2;
-const cameraOffset = vec2(0, -.5);
-const backgroundColor = hsl(0, 0, .2);
+const fallTime = 0.2;
+const swapTime = 0.2;
+const cameraOffset = vec2(0, -0.5);
+const backgroundColor = hsl(0, 0, 0.2);
 const minMatchCount = 3;
 const highScoreKey = 'puzzleBestScore';
 
 // sound effects
-const sound_goodMove = new LJS.Sound([.4, .2, 250, .04, undefined, .04, undefined, undefined, 1, undefined, undefined, undefined, undefined, 3]);
-const sound_badMove = new LJS.Sound([undefined, undefined, 700, undefined, undefined, .07, undefined, undefined, undefined, 3.7, undefined, undefined, undefined, 3, undefined, undefined, .1]);
-const sound_fall = new LJS.Sound([.2, undefined, 1900, undefined, undefined, .01, undefined, 1.4, undefined, 91, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, .7]);
+const sound_goodMove = new LJS.Sound([0.4, 0.2, 250, 0.04, undefined, 0.04, undefined, undefined, 1, undefined, undefined, undefined, undefined, 3]);
+const sound_badMove = new LJS.Sound([undefined, undefined, 700, undefined, undefined, 0.07, undefined, undefined, undefined, 3.7, undefined, undefined, undefined, 3, undefined, undefined, 0.1]);
+const sound_fall = new LJS.Sound([0.2, undefined, 1900, undefined, undefined, 0.01, undefined, 1.4, undefined, 91, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, 0.7]);
 
 let level, levelSize, levelFall, fallTimer, swapTimer, swapPosA, swapPosB, swapReverse, dragStartPos, comboCount, score, bestScore;
 
