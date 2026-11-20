@@ -9,9 +9,8 @@
 
 'use strict';
 
-// import LittleJS module
-import * as LJS from '../../node_modules/littlejsengine/dist/littlejs.esm.js';
 import * as GameLevel from './gameLevel.js';
+import * as LJS from "littlejsengine";
 
 const {vec2, hsl} = LJS;
 
@@ -140,7 +139,7 @@ export function destroyTile(pos, makeSound = 1, cleanup = 1) {
 
     const centerPos = pos.add(vec2(.5));
     const layerData = layer.getData(pos);
-    if (!layerData || tileType == GameLevel.tileType_solid)
+    if (!layerData || tileType === GameLevel.tileType_solid)
         return false;
 
     // create effects

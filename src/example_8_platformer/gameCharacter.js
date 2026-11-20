@@ -11,12 +11,11 @@
 
 'use strict';
 
-// import LittleJS module
-import * as LJS from '../../node_modules/littlejsengine/dist/littlejs.esm.js';
 import * as GameObjects from './gameObjects.js';
 import * as GameEffects from './gameEffects.js';
 import * as GameLevel from './gameLevel.js';
 import * as Game from './game.js';
+import * as LJS from "littlejsengine";
 
 const {vec2, hsl, Timer} = LJS;
 
@@ -106,7 +105,7 @@ export class Character extends GameObjects.GameObject {
         for (let y = 2; y--;) {
             const testPos = this.pos.add(vec2(0, y + .1 * moveInput.y - this.size.y / 2));
             const collisionData = LJS.tileCollisionGetData(testPos);
-            touchingLadder ||= collisionData == GameLevel.tileType_ladder;
+            touchingLadder ||= collisionData === GameLevel.tileType_ladder;
         }
         if (!touchingLadder)
             this.climbingLadder = false;
@@ -161,7 +160,7 @@ export class Character extends GameObjects.GameObject {
 
             if (!this.groundObject) {
                 // air control
-                if (LJS.sign(moveInput.x) == LJS.sign(this.velocity.x))
+                if (LJS.sign(moveInput.x) === LJS.sign(this.velocity.x))
                     moveInput.x *= .1; // moving with velocity
                 else
                     moveInput.x *= .2; // moving against velocity (stopping)
@@ -253,7 +252,7 @@ export class Character extends GameObjects.GameObject {
         if (!data)
             return false;
 
-        if (data == GameLevel.tileType_ladder) {
+        if (data === GameLevel.tileType_ladder) {
             // handle ladder collisions
             if (pos.y + 1 > this.lastPos.y - this.size.y / 2)
                 return false;

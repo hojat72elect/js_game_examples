@@ -9,10 +9,9 @@
 
 'use strict';
 
-// import LittleJS module
-import * as LJS from '../../node_modules/littlejsengine/dist/littlejs.esm.js';
 import * as GameCharacter from './gameCharacter.js';
 import * as Game from './game.js';
+import * as LJS from "littlejsengine";
 
 export class Player extends GameCharacter.Character {
     update() {

@@ -8,12 +8,11 @@
 
 'use strict';
 
-// import LittleJS module
-import * as LJS from '../../node_modules/littlejsengine/dist/littlejs.esm.js';
 import * as GameObjects from './gameObjects.js';
 import * as GameEffects from './gameEffects.js';
 import * as GamePlayer from './gamePlayer.js';
 import * as GameLevel from './gameLevel.js';
+import * as LJS from "littlejsengine";
 
 const {vec2} = LJS;
 
@@ -150,7 +149,7 @@ function gameRenderPost() {
         context.strokeText(text, x, y);
         context.fillText(text, x, y);
     }
-    drawText('Score: ' + score, LJS.mainCanvasSize.x * 1 / 4, 20);
+    drawText('Score: ' + score, LJS.mainCanvasSize.x / 4, 20);
     drawText('Deaths: ' + deaths, LJS.mainCanvasSize.x * 3 / 4, 20);
 }
 

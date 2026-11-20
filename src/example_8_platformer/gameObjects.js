@@ -8,10 +8,9 @@
 
 'use strict';
 
-// import LittleJS module
-import * as LJS from '../../node_modules/littlejsengine/dist/littlejs.esm.js';
 import * as GameEffects from './gameEffects.js';
 import * as Game from './game.js';
+import * as LJS from "littlejsengine";
 
 const {vec2, hsl, Timer} = LJS;
 
