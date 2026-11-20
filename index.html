@@ -1,13 +1,311 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>js_games</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+<head>
+    <meta charset="UTF-8"/>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>JavaScript Game Examples</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --card-hover: #334155;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+            --accent-hover: #0ea5e9;
+            --border: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2.5rem 1.5rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #38bdf8, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 25px -5px rgba(56, 189, 248, 0.2);
+            background-color: var(--card-hover);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .badge {
+            background-color: rgba(56, 189, 248, 0.15);
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 0.85rem;
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .card-desc {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 1.25rem;
+        }
+
+        .card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .card-footer svg {
+            width: 18px;
+            height: 18px;
+            transition: transform 0.2s ease;
+        }
+
+        .card:hover .card-footer svg {
+            transform: translateX(4px);
+        }
+
+        footer {
+            margin-top: 3rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>JavaScript Game Examples</h1>
+    <p class="subtitle">Select a game below to launch it, or use package.json scripts</p>
+</header>
+<main class="grid">
+    <a class="card" href="/src/example_1_hello_world/index.html">
+        <div>
+            <div class="card-header">
+                <span class="badge">#1</span>
+                <h2 class="card-title">Hello World</h2>
+            </div>
+            <p class="card-desc">Basic LittleJS setup demonstrating simple rendering and click explosion effects.</p>
+        </div>
+        <div class="card-footer">
+            <span>Play Game</span>
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+            </svg>
+        </div>
+    </a>
+
+    <a class="card" href="/src/example_2_3d/index.html">
+        <div>
+            <div class="card-header">
+                <span class="badge">#2</span>
+                <h2 class="card-title">3D Example</h2>
+            </div>
+            <p class="card-desc">Showcases 3D rendering with LittleJS plugin integration and tile rendering.</p>
+        </div>
+        <div class="card-footer">
+            <span>Play Game</span>
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+            </svg>
+        </div>
+    </a>
+
+    <a class="card" href="/src/example_3_2D_physics/index.html">
+        <div>
+            <div class="card-header">
+                <span class="badge">#3</span>
+                <h2 class="card-title">2D Physics (Box2D)</h2>
+            </div>
+            <p class="card-desc">Box2D WASM physics demonstration with interactive joints, shapes, and collisions.</p>
+        </div>
+        <div class="card-footer">
+            <span>Play Game</span>
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+            </svg>
+        </div>
+    </a>
+
+    <a class="card" href="/src/example_4_breakout/index.html">
+        <div>
+            <div class="card-header">
+                <span class="badge">#4</span>
+                <h2 class="card-title">Breakout</h2>
+            </div>
+            <p class="card-desc">Classic breakout arcade game with sounds, particles, score tracking, and CRT TV
+                shader.</p>
+        </div>
+        <div class="card-footer">
+            <span>Play Game</span>
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+            </svg>
+        </div>
+    </a>
+
+    <a class="card" href="/src/example_5_html_menu/index.html">
+        <div>
+            <div class="card-header">
+                <span class="badge">#5</span>
+                <h2 class="card-title">HTML Menu</h2>
+            </div>
+            <p class="card-desc">Demonstrates overlaying native HTML DOM UI and menus over the LittleJS canvas game
+                loop.</p>
+        </div>
+        <div class="card-footer">
+            <span>Play Game</span>
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+            </svg>
+        </div>
+    </a>
+
+    <a class="card" href="/src/example_6_module/index.html">
+        <div>
+            <div class="card-header">
+                <span class="badge">#6</span>
+                <h2 class="card-title">Module Demo</h2>
+            </div>
+            <p class="card-desc">LittleJS modular ES-module structure demonstration with ES imports and modules.</p>
+        </div>
+        <div class="card-footer">
+            <span>Play Game</span>
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+            </svg>
+        </div>
+    </a>
+
+    <a class="card" href="/src/example_7_particle_editor/index.html">
+        <div>
+            <div class="card-header">
+                <span class="badge">#7</span>
+                <h2 class="card-title">Particle Designer</h2>
+            </div>
+            <p class="card-desc">Interactive visual particle effect editor and generator for creating and exporting
+                particle systems.</p>
+        </div>
+        <div class="card-footer">
+            <span>Play Game</span>
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+            </svg>
+        </div>
+    </a>
+
+    <a class="card" href="/src/example_8_platformer/index.html">
+        <div>
+            <div class="card-header">
+                <span class="badge">#8</span>
+                <h2 class="card-title">Platformer</h2>
+            </div>
+            <p class="card-desc">Full 2D side-scrolling platformer featuring character physics, tilemap levels, coins,
+                and enemies.</p>
+        </div>
+        <div class="card-footer">
+            <span>Play Game</span>
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+            </svg>
+        </div>
+    </a>
+
+    <a class="card" href="/src/example_9_match_three/index.html">
+        <div>
+            <div class="card-header">
+                <span class="badge">#9</span>
+                <h2 class="card-title">Match Three</h2>
+            </div>
+            <p class="card-desc">Addictive match-3 grid puzzle game with swapping animations and match resolution.</p>
+        </div>
+        <div class="card-footer">
+            <span>Play Game</span>
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+            </svg>
+        </div>
+    </a>
+
+    <a class="card" href="/src/example_10_3D/index.html">
+        <div>
+            <div class="card-header">
+                <span class="badge">#10</span>
+                <h2 class="card-title">Three.js 3D Platformer</h2>
+            </div>
+            <p class="card-desc">3D platformer combining LittleJS 2D game logic and collision with Three.js 3D rendering
+                and chase cam.</p>
+        </div>
+        <div class="card-footer">
+            <span>Play Game</span>
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+            </svg>
+        </div>
+    </a>
+</main>
+</body>
 </html>
