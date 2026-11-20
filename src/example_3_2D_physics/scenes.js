@@ -19,9 +19,9 @@
 'use strict';
 
 // import game module
-import * as LJS from '../../node_modules/littlejsengine/dist/littlejs.esm.js';
 import * as GameObjects from './gameObjects.js';
 import * as Game from './game.js';
+import * as LJS from "littlejsengine";
 
 const {vec2} = LJS;
 
