@@ -6,8 +6,7 @@
 
 'use strict';
 
-// import LittleJS module
-import * as LJS from '../../node_modules/littlejsengine/dist/littlejs.esm.js';
+import * as LJS from "littlejsengine";
 
 const {tile, vec2, hsl} = LJS;
 
