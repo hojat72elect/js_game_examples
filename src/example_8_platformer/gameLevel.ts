@@ -4,20 +4,44 @@
     - Picks colors for the level and background.
     - Creates ladders and spawns enemies and crates.
 */
-import * as GameObjects from './gameObjects.js';
-import * as GameEffects from './gameEffects.js';
-import * as Game from './game.js';
-import * as LJS from "littlejsengine";
-
-const {vec2, hsl, tile} = LJS;
+import {
+    ASSERT,
+    cameraScale,
+    CLEAR_WHITE,
+    engineObjectsDestroy,
+    hsl,
+    levelEditor,
+    mainCanvasSize,
+    objectLayersAddType,
+    objectLayersLoad,
+    ParallaxLayer,
+    parallaxMountains,
+    percent,
+    randColor,
+    randInt,
+    tile,
+    TileLayerData,
+    tileLayersLoad,
+    vec2
+} from "littlejsengine";
+import {Coin, Crate, Enemy} from "./gameObjects.ts";
+import {Sky} from "./gameEffects.ts";
+import {gameLevelData, spriteAtlas} from "./game.ts";
 
 export const tileType_ladder = -1;
 export const tileType_empty = 0;
 export const tileType_solid = 1;
 export const tileType_breakable = 2;
 
-export let playerStartPos, tileLayers, foregroundTileLayer, sky;
-export let levelSize, levelColor, levelBackgroundColor, levelOutlineColor;
+export let playerStartPos: any;
+export let tileLayers: any;
+export let foregroundTileLayer: any;
+export let sky: any;
+
+export let levelSize: any;
+export let levelColor: any;
+export let levelBackgroundColor: any;
+export let levelOutlineColor: any;
 
 // table for tiles in the level tilemap
 const tileLookup =
@@ -34,16 +58,16 @@ const tileLookup =
 
 export function buildLevel() {
     // destroy all objects
-    LJS.engineObjectsDestroy();
+    engineObjectsDestroy();
 
     // create the level
-    levelColor = LJS.randColor(hsl(0, 0, .2), hsl(0, 0, .8));
+    levelColor = randColor(hsl(0, 0, .2), hsl(0, 0, .8));
     levelBackgroundColor = levelColor.mutate().scale(.4, 1);
     levelOutlineColor = levelColor.mutate().add(hsl(0, 0, .4)).clamp();
     loadLevelData();
 
     // create sky object with gradient background and stars
-    sky = new GameEffects.Sky;
+    sky = new Sky;
 
     // create parallax layers of mountains, the nearer ones bigger, lower
     // and shifting more as the camera crosses the level
@@ -51,15 +75,15 @@ export function buildLevel() {
     const zoom = 4 * 16; // the camera scale the sizes are for
     for (let i = 3; i--;) {
         const topColor = levelColor.mutate(.2).lerp(sky.skyColor, .8 - i * .15);
-        const bottomColor = levelColor.subtract(LJS.CLEAR_WHITE).mutate(.2);
+        const bottomColor = levelColor.subtract(CLEAR_WHITE).mutate(.2);
 
         // how many pixels it has shifted when the camera is at the level's edge
         const shift = vec2(150, 30).scale(i ** 2 + 1);
         const parallax = vec2(1 - shift.x / (center.x * zoom), 1 - shift.y / (center.y * zoom));
         const pos = center.add(vec2(0, (2 - i) / (1 - parallax.y)));
         const size = vec2(512, 256).scale((4 + i) / zoom);
-        const layer = new LJS.ParallaxLayer(pos, size, parallax, i - 3e3,
-            LJS.parallaxMountains(topColor, bottomColor));
+        const layer = new ParallaxLayer(pos, size, parallax, i - 3e3,
+            parallaxMountains(topColor, bottomColor));
 
         // the mountains stay the same size on screen when the camera zooms
         layer.zoomFollow = 0;
@@ -69,8 +93,8 @@ export function buildLevel() {
 
 function loadLevelData() {
     // load the level data
-    const tileMapData = Game.gameLevelData;
-    tileLayers = LJS.tileLayersLoad(tileMapData, tile(0, 16, 1), 0, 1);
+    const tileMapData = gameLevelData;
+    tileLayers = tileLayersLoad(tileMapData, tile(0, 16, 1), 0, 1);
     levelSize = tileLayers[0].size;
     playerStartPos = vec2(0, levelSize.y); // default player start
     foregroundTileLayer = tileLayers[0];
@@ -100,20 +124,20 @@ function loadLevelData() {
 
     // the objects of the level's object layer, each type with its sprite as an icon for the level editor;
     // an old map with marker tiles still works, the loop above makes those
-    const sprites = Game.spriteAtlas;
-    LJS.objectLayersAddType('PlayerStart', (pos) => playerStartPos = pos, {}, sprites.player);
-    LJS.objectLayersAddType('Crate', GameObjects.Crate, {}, sprites.crate);
-    LJS.objectLayersAddType('Enemy', GameObjects.Enemy, {}, sprites.enemy);
-    LJS.objectLayersAddType('Coin', GameObjects.Coin, {}, sprites.coin);
-    LJS.objectLayersLoad(tileMapData);
+    const sprites = spriteAtlas;
+    objectLayersAddType('PlayerStart', (pos) => playerStartPos = pos, {}, sprites.player);
+    objectLayersAddType('Crate', Crate, {}, sprites.crate);
+    objectLayersAddType('Enemy', Enemy, {}, sprites.enemy);
+    objectLayersAddType('Coin', Coin, {}, sprites.coin);
+    objectLayersLoad(tileMapData);
 
     // the level editor (Esc then 0) paints tiles with the same rules
-    LJS.levelEditor.onTile = (tileLayer, pos, tileData) => setupTile(tileLayer, pos, tileData, false);
+    levelEditor.onTile = (tileLayer, pos, tileData) => setupTile(tileLayer, pos, tileData, false);
 }
 
 // set up a cell's collision and look from its tile, when the level loads and when the level editor paints it;
 // the marker tiles of an old map become objects when the level loads, they are blank in the sheet now
-function setupTile(tileLayer, pos, tileData, spawnObjects) {
+function setupTile(tileLayer: any, pos: any, tileData: any, spawnObjects: any) {
     if (tileData >= tileLookup.player) {
         if (spawnObjects) {
             // create object instead of tile
@@ -121,11 +145,11 @@ function setupTile(tileLayer, pos, tileData, spawnObjects) {
             if (tileData == tileLookup.player)
                 playerStartPos = objectPos;
             if (tileData == tileLookup.crate)
-                new GameObjects.Crate(objectPos);
+                new Crate(objectPos);
             if (tileData == tileLookup.enemy)
-                new GameObjects.Enemy(objectPos);
+                new Enemy(objectPos);
             if (tileData == tileLookup.coin)
-                new GameObjects.Coin(objectPos);
+                new Coin(objectPos);
         }
 
         // replace with empty tile and empty collision
@@ -146,18 +170,19 @@ function setupTile(tileLayer, pos, tileData, spawnObjects) {
         tileLayer.setCollisionData(pos, tileType);
     if (tileType == tileType_breakable) {
         // randomize tile appearance
-        const direction = LJS.randInt(4);
-        const mirror = LJS.randInt(2);
+        const direction = randInt(4);
+        const mirror = randInt(2);
         const color = (tileLayer == foregroundTileLayer ? levelColor : levelBackgroundColor).mutate(.03);
 
         // set tile layer data
-        const data = new LJS.TileLayerData(tileData, direction, mirror, color);
+        // @ts-ignore
+        const data = new TileLayerData(tileData, direction, mirror, color);
         tileLayer.setData(pos, data, !spawnObjects);
     }
 }
 
-export function decorateTile(pos, tileLayer) {
-    LJS.ASSERT((pos.x | 0) == pos.x && (pos.y | 0) == pos.y);
+export function decorateTile(pos: any, tileLayer: any) {
+    ASSERT((pos.x | 0) == pos.x && (pos.y | 0) == pos.y);
     if (!tileLayer)
         return;
 
@@ -210,5 +235,5 @@ export function decorateTile(pos, tileLayer) {
 
 export function getCameraOffset() {
     // camera is above player
-    return vec2(0, 100 / LJS.cameraScale * LJS.percent(LJS.mainCanvasSize.y, 300, 600));
+    return vec2(0, 100 / cameraScale * percent(mainCanvasSize.y, 300, 600));
 }
