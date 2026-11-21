@@ -1,64 +1,66 @@
 /*
     LittleJS 3D Example
-    - A tour of the 3D plugin in one scene
-    - Terrain from a height map, shadows, fog and a sky
-    - Meshes built from shapes, a forest sharing one mesh, sprites and 3D text
+    - A tour of the 3D plugin in one scene.
+    - Terrain from a height map, shadows, fog and a sky.
+    - Meshes built from shapes, a forest sharing one mesh, sprites and 3D text.
     - Point lights with lens flares, particles, a trail, bloom and 3D sound
-    - Roll the ball with the arrow keys, jump with space, and collect the orbs
+    - Roll the ball with the arrow keys, jump with space, and collect the orbs.
     - The island is a 3D level: Esc then 0 opens the level editor, to sculpt
       and paint the terrain and place trees, sprites and orbs
 */
-
-'use strict';
-
 // each tile in tiles.png has a 1 pixel border, which stops texture bleeding
-import {setTileDefaultPadding} from "littlejsengine";
-import {Sound} from "littlejsengine";
-import {RandomGenerator} from "littlejsengine";
-import {EngineObject3D} from "littlejsengine";
-import {buildSphere} from "littlejsengine";
-import {render3D} from "littlejsengine";
-import {min} from "littlejsengine";
-import {max} from "littlejsengine";
-import {vec3} from "littlejsengine";
-import {sin} from "littlejsengine";
-import {time} from "littlejsengine";
-import {ParticleEmitter3D} from "littlejsengine";
-import {Light3D} from "littlejsengine";
-import {PI} from "littlejsengine";
-import {WHITE} from "littlejsengine";
-import {CLEAR_WHITE} from "littlejsengine";
-import {tile} from "littlejsengine";
-import {Timer} from "littlejsengine";
-import {hsl} from "littlejsengine";
-import {Trail3D} from "littlejsengine";
-import {vec2} from "littlejsengine";
-import {keyDirection} from "littlejsengine";
-import {clamp} from "littlejsengine";
-import {keyWasPressed} from "littlejsengine";
-import {round} from "littlejsengine";
-import {noise2D} from "littlejsengine";
-import {hypot} from "littlejsengine";
-import {HeightMap} from "littlejsengine";
-import {engineObjectsDestroy} from "littlejsengine";
-import {level3DLoad} from "littlejsengine";
-import {ThirdPersonCamera3D} from "littlejsengine";
-import {Render3DPlugin} from "littlejsengine";
-import {postProcessBloom} from "littlejsengine";
-import {DirectionalLight3D} from "littlejsengine";
-import {LensFlare3D} from "littlejsengine";
-import {Mesh} from "littlejsengine";
-import {buildCylinder} from "littlejsengine";
-import {buildCone} from "littlejsengine";
-import {level3DAddMesh} from "littlejsengine";
-import {level3DAddType} from "littlejsengine";
-import {fetchJSON} from "littlejsengine";
-import {buildText3D} from "littlejsengine";
-import {levelEditor} from "littlejsengine";
-import {FirstPersonCamera3D} from "littlejsengine";
-import {mainCanvasSize} from "littlejsengine";
-import {drawTextScreen} from "littlejsengine";
-import {engineInit} from "littlejsengine";
+import {
+    buildCone,
+    buildCylinder,
+    buildSphere,
+    buildText3D,
+    clamp,
+    CLEAR_WHITE,
+    type Color,
+    DirectionalLight3D,
+    drawTextScreen,
+    engineInit,
+    EngineObject3D,
+    engineObjectsDestroy,
+    fetchJSON,
+    FirstPersonCamera3D,
+    HeightMap,
+    hsl,
+    hypot,
+    keyDirection,
+    keyWasPressed,
+    LensFlare3D,
+    level3DAddMesh,
+    level3DAddType,
+    level3DLoad,
+    levelEditor,
+    Light3D,
+    mainCanvasSize,
+    max,
+    Mesh,
+    min,
+    noise2D,
+    ParticleEmitter3D,
+    PI,
+    postProcessBloom,
+    RandomGenerator,
+    render3D,
+    Render3DPlugin,
+    round,
+    setTileDefaultPadding,
+    sin,
+    Sound,
+    type SoundInstance,
+    ThirdPersonCamera3D,
+    tile,
+    time,
+    Timer,
+    Trail3D,
+    vec2,
+    vec3,
+    type Vector3,
+    WHITE
+} from "littlejsengine";
 
 setTileDefaultPadding(1);
 
@@ -72,13 +74,22 @@ const worldRandom = new RandomGenerator(1234); // the same world every time
 // made from noise once it is put next to this file and named here
 const levelFile = '';
 
-let level, terrain, player, playerStart, title, camera, freeCamera;
+let level: any;
+let terrain: any;
+let player: any;
+let playerStart: any;
+let title: any;
+let camera: any;
+let freeCamera: any;
 
-///////////////////////////////////////////////////////////////////////////////
 // the player rolls over the terrain with a trail behind it
-
 class Player extends EngineObject3D {
-    constructor(pos) {
+    speed;
+    speedY;
+    groundTimer;
+    engineLoop: SoundInstance | undefined;
+
+    constructor(pos: any) {
         super(pos.copy(), buildSphere(2));
         this.pos3D.y = terrain.getHeight(this.pos3D) + 1; // start on the ground
         this.color = hsl(.55, .8, .6);
@@ -133,11 +144,9 @@ class Player extends EngineObject3D {
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
 // orbs to collect, each one a light with a burst when it is taken
-
 class Orb extends EngineObject3D {
-    constructor(pos, properties) {
+    constructor(pos: any, properties: any) {
         super(pos, render3D.sphereMesh);
         this.scale3D = vec3(1.4);
         this.emissive = 1; // make it appear bright
@@ -169,11 +178,10 @@ class Orb extends EngineObject3D {
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
 // a sprite from the tile sheet, standing on the ground
 
 class Sprite extends EngineObject3D {
-    constructor(pos, properties) {
+    constructor(pos: any, properties: any) {
         super(pos, undefined, tile(properties.tile, 16));
         this.size3D = vec3(3);
         this.upright = true;  // stands on the ground
@@ -181,7 +189,6 @@ class Sprite extends EngineObject3D {
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
 // the island as a 3D level, made once from noise
 
 // a random spot on the island, clear of the middle where the player starts
@@ -191,13 +198,13 @@ function randomGroundPos() {
 }
 
 // a color as a level keeps it, and a position to a hundredth
-const hex = (color) => color.toString(false);
-const place = (pos) => [pos.x, pos.y, pos.z].map((v) => round(v * 100) / 100);
+const hex = (color: Color) => color.toString(false);
+const place = (pos: Vector3) => [pos.x, pos.y, pos.z].map((v) => round(v * 100) / 100);
 
 function makeLevel() {
     // an island of noise, higher in the middle and sinking at the edges, its
     // colors painted on by height, from a list of 26 the editor paints with
-    const samples = 129, heights = [], paint = [], colors = [];
+    const samples = 129, heights = [], paint = [], colors: string[] = [];
     const water = hsl(.55, .5, .45), rock = hsl(.1, .2, .45);
     for (let row = 0; row < samples; ++row) {
         const heightRow = [];
@@ -230,8 +237,8 @@ function makeLevel() {
 
     // the ground under each spot, from a height map made only to ask
     const ground = new HeightMap(heights, vec2(terrainSize), terrainHeight);
-    const objects = [];
-    const add = (type, pos, more) =>
+    const objects: object[] = [];
+    const add = (type: string, pos: Vector3, more: object = {}) =>
         objects.push({id: objects.length + 1, type, pos: place(pos), ...more});
     add('PlayerStart', vec3(0, ground.getHeight(vec3(0, 0, 6)) + 1, 6));
 
@@ -276,8 +283,6 @@ function loadLevel() {
     camera.smoothing = .15;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-
 async function gameInit() {
     // the 3D pass draws first, then bloom shades the WebGL canvas
     new Render3DPlugin;
@@ -319,7 +324,7 @@ async function gameInit() {
     // the editor's Restart builds the level again with the edits, and Play
     // from mouse puts the ball where the mouse is
     levelEditor.onRestart = loadLevel;
-    levelEditor.onPlayFrom = (pos) => {
+    levelEditor.onPlayFrom = (pos: Vector3) => {
         player.pos3D = pos.add(vec3(0, 1, 0));
         player.speed = vec3();
     };
