@@ -21,7 +21,7 @@ const sound_break = new Sound([undefined, undefined, 90, undefined, .01, .03, 4,
 const sound_bounce = new Sound([undefined, undefined, 1e3, undefined, .03, .02, 1, 2, undefined, undefined, 940, .03, undefined, undefined, undefined, undefined, .2, .6, undefined, .06]);
 
 export class PhysicsObject extends EngineObject {
-    constructor(pos, size, tileInfo, angle, color) {
+    constructor(pos: any, size: any, tileInfo: any, angle: any, color: any) {
         super(pos, size, tileInfo, angle, color);
         this.setCollision(); // make object collide
         this.mass = 0; // make object have static physics
@@ -29,13 +29,14 @@ export class PhysicsObject extends EngineObject {
 }
 
 export class Wall extends PhysicsObject {
-    constructor(pos, size) {
+    constructor(pos: any, size: any) {
         super(pos, size, 0, 0, hsl(0, 0, 0, 0));
     }
 }
 
 export class Paddle extends PhysicsObject {
-    constructor(pos) {
+    constructor(pos: any) {
+        // @ts-ignore
         super(pos, vec2(5, .5));
     }
 
@@ -49,12 +50,13 @@ export class Paddle extends PhysicsObject {
 }
 
 export class Brick extends PhysicsObject {
-    constructor(pos) {
+    constructor(pos: any) {
         super(pos, vec2(2, 1), tile(1, vec2(32, 16)), 0, randColor());
         changeBrickCount(1);
     }
 
-    collideWithObject(o) {
+    // @ts-ignore
+    collideWithObject(o: any) {
         // destroy brick when hit with ball
         this.destroy();
         changeBrickCount(-1);
@@ -63,16 +65,8 @@ export class Brick extends PhysicsObject {
         // make explosion effect
         const color1 = this.color;
         const color2 = color1.lerp(hsl(), .5);
-        new ParticleEmitter(
-            this.pos, 0,                          // pos, angle
-            this.size, .1, 200, 3.14,             // emitSize, emitTime, rate, cone
-            tile(0, 16),                          // tileInfo
-            color1, color2,                       // colorStartA, colorStartB
-            color1.scale(1, 0), color2.scale(1, 0), // colorEndA, colorEndB
-            .3, .8, .3, .05, .05,// time, sizeStart, sizeEnd, speed, angleSpeed
-            .99, .95, .4, 3.14,  // damp, angleDamp, gravity, cone
-            .1, .8, 0, 1         // fade, randomness, collide, additive
-        );
+        // @ts-ignore
+        new ParticleEmitter(this.pos, 0, this.size, .1, 200, 3.14, tile(0, 16), color1, color2, color1.scale(1, 0), color2.scale(1, 0), .3, .8, .3, .05, .05, .99, .95, .4, 3.14, .1, .8, 0, 1);
 
         // set ball trail color
         if (o.trailEffect) {
@@ -85,7 +79,11 @@ export class Brick extends PhysicsObject {
 }
 
 export class Ball extends PhysicsObject {
-    constructor(pos) {
+
+    trailEffect;
+
+    constructor(pos: any) {
+        // @ts-ignore
         super(pos, vec2(.5), tile(0));
 
         // make a bouncy ball
@@ -95,21 +93,13 @@ export class Ball extends PhysicsObject {
 
         // attach a trail effect
         const color = hsl(0, 0, .2);
-        this.trailEffect = new ParticleEmitter(
-            this.pos, 0,                          // pos, angle
-            this.size, 0, 80, 3.14,               // emitSize, emitTime, rate, cone
-            tile(0, 16),                          // tileInfo
-            color, color,                         // colorStartA, colorStartB
-            color.scale(0), color.scale(0),       // colorEndA, colorEndB
-            2, .4, 1, .001, .05,// time, sizeStart, sizeEnd, speed, angleSpeed
-            .99, .95, 0, 3.14,  // damp, angleDamp, gravity, cone
-            .1, .5, 0, 1        // fade, randomness, collide, additive
-        );
+        // @ts-ignore
+        this.trailEffect = new ParticleEmitter(this.pos, 0, this.size, 0, 80, 3.14, tile(0, 16), color, color, color.scale(0), color.scale(0), 2, .4, 1, .001, .05, .99, .95, 0, 3.14, .1, .5, 0, 1);
         this.addChild(this.trailEffect);
         sound_start.play(this.pos);
     }
 
-    collideWithObject(o) {
+    collideWithObject(o: any) {
         // only need special handling when colliding with paddle
         if (o !== paddle)
             return true;
@@ -123,7 +113,7 @@ export class Ball extends PhysicsObject {
         this.velocity.y = max(-this.velocity.y, .2);
 
         // speed up
-        const speed = min(1.04 * this.getSpeed(), .5);
+        const speed = min(1.04 * this.getSpeed(), 0.5);
         this.velocity = this.velocity.normalize(speed);
         sound_bounce.play(this.pos, 1, speed * 2);
 
