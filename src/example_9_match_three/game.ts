@@ -1,21 +1,39 @@
-/*
-    Little Puzzle Game
-    - A simple match 3 style puzzle game
-    - Uses a high resolution texture
-    - Tracks high score in local storage
-    - Control with mouse or touch
-*/
+/**
+ * A simple match 3 style puzzle game.
+ */
+import {
+    abs,
+    cameraPos,
+    drawRect,
+    drawText,
+    drawTile,
+    engineInit,
+    engineObjectsDestroy,
+    hsl,
+    keyWasPressed,
+    mouseIsDown,
+    mousePos,
+    mouseWasPressed,
+    ParticleEmitter,
+    percent,
+    randInt,
+    setCameraPos,
+    setCameraScale,
+    setCanvasClearColor,
+    setCanvasFixedSize,
+    setCanvasPixelated,
+    setGravity,
+    setTilesPixelated,
+    Sound,
+    tile,
+    Timer,
+    vec2,
+    type Vector2
+} from "littlejsengine";
 
-'use strict';
-
-import * as LJS from "littlejsengine";
-
-const {vec2, hsl, tile} = LJS;
-
-///////////////////////////////////////////////////////////////////////////////
 // do not use pixelated rendering
-LJS.setCanvasPixelated(false);
-LJS.setTilesPixelated(false);
+setCanvasPixelated(false);
+setTilesPixelated(false);
 
 const fallTime = 0.2;
 const swapTime = 0.2;
@@ -25,13 +43,24 @@ const minMatchCount = 3;
 const highScoreKey = 'puzzleBestScore';
 
 // sound effects
-const sound_goodMove = new LJS.Sound([0.4, 0.2, 250, 0.04, undefined, 0.04, undefined, undefined, 1, undefined, undefined, undefined, undefined, 3]);
-const sound_badMove = new LJS.Sound([undefined, undefined, 700, undefined, undefined, 0.07, undefined, undefined, undefined, 3.7, undefined, undefined, undefined, 3, undefined, undefined, 0.1]);
-const sound_fall = new LJS.Sound([0.2, undefined, 1900, undefined, undefined, 0.01, undefined, 1.4, undefined, 91, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, 0.7]);
+const sound_goodMove = new Sound([0.4, 0.2, 250, 0.04, undefined, 0.04, undefined, undefined, 1, undefined, undefined, undefined, undefined, 3]);
+const sound_badMove = new Sound([undefined, undefined, 700, undefined, undefined, 0.07, undefined, undefined, undefined, 3.7, undefined, undefined, undefined, 3, undefined, undefined, 0.1]);
+const sound_fall = new Sound([0.2, undefined, 1900, undefined, undefined, 0.01, undefined, 1.4, undefined, 91, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, 0.7]);
 
-let level, levelSize, levelFall, fallTimer, swapTimer, swapPosA, swapPosB, swapReverse, dragStartPos, comboCount, score, bestScore;
+let level: any;
+let levelSize: any;
+let levelFall: any;
+let fallTimer: any;
+let swapTimer: any;
+let swapPosA: Vector2;
+let swapPosB: Vector2;
+let swapReverse: any;
+let dragStartPos: any;
+let comboCount: any;
+let score: any;
+let bestScore: any;
 
-///////////////////////////////////////////////////////////////////////////////
+
 // tiles
 const tileColors =
     [
@@ -45,31 +74,31 @@ const tileColors =
     ];
 const tileTypeCount = tileColors.length;
 
-const getTile = (pos) => level[pos.x + pos.y * levelSize.x];
-const setTile = (pos, data) => level[pos.x + pos.y * levelSize.x] = data;
+const getTile = (pos: Vector2) => level[pos.x + pos.y * levelSize.x];
+const setTile = (pos: Vector2, data: number) => level[pos.x + pos.y * levelSize.x] = data;
 
-///////////////////////////////////////////////////////////////////////////////
+
 function gameReset() {
     // reset game objects
-    LJS.engineObjectsDestroy();
+    engineObjectsDestroy();
 
     // randomize level
     level = [];
     const pos = vec2();
     for (pos.x = levelSize.x; pos.x--;)
         for (pos.y = levelSize.y; pos.y--;)
-            setTile(pos, LJS.randInt(tileTypeCount));
+            setTile(pos, randInt(tileTypeCount));
 
     comboCount = score = 0;
-    fallTimer = new LJS.Timer;
-    swapTimer = new LJS.Timer;
+    fallTimer = new Timer;
+    swapTimer = new Timer;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+
 function gameInit() {
     // setup canvas
-    LJS.setCanvasFixedSize(vec2(1920, 1080)); // 1080p
-    LJS.setCanvasClearColor(backgroundColor);
+    setCanvasFixedSize(vec2(1920, 1080)); // 1080p
+    setCanvasClearColor(backgroundColor);
     // load high score, storage throws where the browser blocks it
     try {
         bestScore = localStorage[highScoreKey] || 0;
@@ -79,15 +108,15 @@ function gameInit() {
 
     // setup game
     levelSize = vec2(12, 6);
-    LJS.setCameraPos(levelSize.scale(.5).add(cameraOffset));
-    LJS.setCameraScale(900 / levelSize.y);
-    LJS.setGravity(vec2(0, -.004));
+    setCameraPos(levelSize.scale(.5).add(cameraOffset));
+    setCameraScale(900 / levelSize.y);
+    setGravity(vec2(0, -.004));
 
     // start a new game
     gameReset();
 }
 
-///////////////////////////////////////////////////////////////////////////////
+
 function gameUpdate() {
     if (swapTimer.isSet()) {
         // wait for swap animation to finish
@@ -118,7 +147,7 @@ function gameUpdate() {
         if (fallTimer.elapsed()) {
             // add more blocks in the top
             for (let x = 0; x < levelSize.x; ++x)
-                setTile(vec2(x, levelSize.y), LJS.randInt(tileTypeCount));
+                setTile(vec2(x, levelSize.y), randInt(tileTypeCount));
         }
 
         // allow blocks to fall
@@ -140,7 +169,7 @@ function gameUpdate() {
                 }
 
             if (keepFalling) {
-                const p = LJS.percent(comboCount, 9, 0);
+                const p = percent(comboCount, 9, 0);
                 fallTimer.set(fallTime * p);
                 sound_fall.play();
             } else
@@ -151,17 +180,18 @@ function gameUpdate() {
         clearMatches();
         if (!fallTimer.isSet()) {
             // mouse/touch control
-            const mouseTilePos = LJS.mousePos.floor();
-            if (!LJS.mousePos.arrayCheck(levelSize)) {
+            const mouseTilePos = mousePos.floor();
+            if (!mousePos.arrayCheck(levelSize)) {
                 // cancel drag if mouse is not in the level bounds
                 dragStartPos = 0;
-            } else if (LJS.mouseWasPressed(0) && !dragStartPos) {
+            } else if (mouseWasPressed(0) && !dragStartPos) {
                 // start drag
+                // @ts-ignore
                 dragStartPos = mouseTilePos.copy();
-            } else if (LJS.mouseIsDown(0) && dragStartPos) {
+            } else if (mouseIsDown(0) && dragStartPos) {
                 // if dragging to a neighbor tile
-                const dx = LJS.abs(dragStartPos.x - mouseTilePos.x);
-                const dy = LJS.abs(dragStartPos.y - mouseTilePos.y);
+                const dx = abs(dragStartPos.x - mouseTilePos.x);
+                const dy = abs(dragStartPos.y - mouseTilePos.y);
                 if (dx === 1 && dy === 0 || dx === 0 && dy === 1) {
                     const startTile = getTile(dragStartPos);
                     const endTile = getTile(mouseTilePos);
@@ -190,19 +220,18 @@ function gameUpdate() {
         }
     }
 
-    if (LJS.keyWasPressed('KeyR'))
+    if (keyWasPressed('KeyR'))
         gameReset();
 }
 
-///////////////////////////////////////////////////////////////////////////////
-function gameUpdatePost() {
 
+function gameUpdatePost() {
 }
 
-///////////////////////////////////////////////////////////////////////////////
+
 function gameRender() {
     // draw a black square for the background
-    LJS.drawRect(LJS.cameraPos.subtract(cameraOffset), levelSize, hsl(0, 0, 0));
+    drawRect(cameraPos.subtract(cameraOffset), levelSize, hsl(0, 0, 0));
 
     // draw the blocks
     const pos = vec2();
@@ -215,7 +244,7 @@ function gameRender() {
             // highlight drag start
             const drawPos = pos.add(vec2(.5));
             if (dragStartPos && pos.x === dragStartPos.x && pos.y === dragStartPos.y)
-                LJS.drawRect(drawPos, vec2(1.05));
+                drawRect(drawPos, vec2(1.05));
 
             // make pieces fall gradually
             if (fallTimer.active() && levelFall[pos.x + pos.y * levelSize.x])
@@ -235,29 +264,29 @@ function gameRender() {
 
             // draw background
             const color = tileColors[data];
-            LJS.drawRect(drawPos, vec2(.95), color);
+            drawRect(drawPos, vec2(.95), color);
 
             // use darker color for icon
             const color2 = color.scale(.8, 1);
-            LJS.drawTile(drawPos, vec2(.5), tile(data, 64), color2);
+            drawTile(drawPos, vec2(.5), tile(data, 64), color2);
         }
 
     // draw a gray square at top to cover up incoming tiles
-    LJS.drawRect(LJS.cameraPos.subtract(cameraOffset).add(vec2(0, levelSize.y)), levelSize, backgroundColor);
+    drawRect(cameraPos.subtract(cameraOffset).add(vec2(0, levelSize.y)), levelSize, backgroundColor);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+
 function gameRenderPost() {
     // draw text on top of everything
-    LJS.drawText('Score: ' + score, LJS.cameraPos.add(vec2(-3, -3.1)), .9, hsl(), .1);
-    LJS.drawText('Best: ' + bestScore, LJS.cameraPos.add(vec2(3, -3.1)), .9, hsl(), .1);
+    drawText('Score: ' + score, cameraPos.add(vec2(-3, -3.1)), .9, hsl(), .1);
+    drawText('Best: ' + bestScore, cameraPos.add(vec2(3, -3.1)), .9, hsl(), .1);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Startup LittleJS Engine
-LJS.engineInit(gameInit, gameUpdate, gameUpdatePost, gameRender, gameRenderPost, ['tiles.png']);
 
-///////////////////////////////////////////////////////////////////////////////
+// Startup LittleJS Engine
+engineInit(gameInit, gameUpdate, gameUpdatePost, gameRender, gameRenderPost, ['tiles.png']);
+
+
 // find and remove all runs of 3 or higher
 function clearMatches() {
     // horizontal match check
@@ -267,6 +296,7 @@ function clearMatches() {
         for (pos.x = levelSize.x; pos.x--;) {
             const data = getTile(pos);
             if (data >= 0 && data === runData) {
+                // @ts-ignore
                 for (let i = ++runCount; runCount >= minMatchCount && i--;)
                     removeTiles[pos.x + i + pos.y * levelSize.x] = 1;
             } else {
@@ -282,6 +312,7 @@ function clearMatches() {
         for (pos.y = levelSize.y; pos.y--;) {
             const data = getTile(pos);
             if (data >= 0 && data === runData) {
+                // @ts-ignore
                 for (let i = ++runCount; runCount >= minMatchCount && i--;)
                     removeTiles[pos.x + (pos.y + i) * levelSize.x] = 1;
             } else {
@@ -304,16 +335,8 @@ function clearMatches() {
                 // spawn particles
                 const color1 = tileColors[data];
                 const color2 = color1.lerp(hsl(), .5);
-                new LJS.ParticleEmitter(
-                    pos.add(vec2(.5)), 0, // pos, angle
-                    .5, .1, 200, 3.14,    // emitSize, emitTime, rate, cone
-                    0,                    // tileInfo
-                    color1, color2,                      // colorStartA, colorStartB
-                    color1.scale(1, 0), color2.scale(1, 0),// colorEndA, colorEndB
-                    .5, .3, .2, .05, .05, // particleTime, sizeStart, sizeEnd, speed, angleSpeed
-                    .99, 1, 1, 3.14, .05, // damp, angleDamp, gravityScale, particleCone, fadeRate
-                    .5, 0, 1              // randomness, collide, additive, colorLinear, renderOrder
-                );
+                // @ts-ignore
+                new ParticleEmitter(pos.add(vec2(.5)), 0, .5, .1, 200, 3.14, 0, color1, color2, color1.scale(1, 0), color2.scale(1, 0), .5, .3, .2, .05, .05, .99, 1, 1, 3.14, .05, .5, 0, 1);
             }
         }
 
