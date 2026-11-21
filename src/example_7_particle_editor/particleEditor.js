@@ -1,8 +1,6 @@
 /*
-    LittleJS Particle Designer
-    - The page: settings panel, preview, code panel and storage
-    - Effects, settings and behaviors are the particle effects plugin's,
-      the code export is in particleEffects.js
+    This is the UI of the particle editor.
+    Keep it as as for now (don't try to migrate it to TypeScript).
 */
 
 'use strict';
@@ -40,7 +38,6 @@ const previewOptions = {scale: 1, hue: 0, saturation: 1, flatten: false};
 const effectPresets = () => particleEffectsBuiltIn.map(name =>
     structuredClone(particleEffectsGet(name)));
 
-///////////////////////////////////////////////////////////////////////////////
 // page helpers
 
 const $ = (id) => document.getElementById(id);
@@ -69,7 +66,6 @@ function storageSave(key, value) {
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
 // settings panel
 
 function buildSettingsPanel() {
@@ -314,7 +310,6 @@ function makeBehaviorRow(parent, behavior) {
     return {refresh};
 }
 
-///////////////////////////////////////////////////////////////////////////////
 // editing
 
 // change one setting of the effect being edited
@@ -452,7 +447,6 @@ function fitCameraScale() {
     return min(64, $('previewArea').clientHeight / 9);
 }
 
-///////////////////////////////////////////////////////////////////////////////
 // library and storage
 
 function saveLibrary() {
@@ -499,7 +493,6 @@ function refreshLibraryBar() {
         $('effectName').value = effect.name;
 }
 
-///////////////////////////////////////////////////////////////////////////////
 // preview and code panel controls
 
 function setupPreviewControls() {
@@ -579,7 +572,6 @@ function setupPreviewControls() {
     };
 }
 
-///////////////////////////////////////////////////////////////////////////////
 // library bar
 
 function setupLibraryBar() {
@@ -607,7 +599,7 @@ function setupLibraryBar() {
     $('buttonClear').onclick = () => {
         // Save Library first keeps them, Add Presets brings the built in back
         const count = library.length;
-        if (!confirm(`Delete all ${count} effect${count == 1 ? '' : 's'}?`))
+        if (!confirm(`Delete all ${count} effect${count === 1 ? '' : 's'}?`))
             return;
         library = [particleEffectSanitize({name: 'New Effect'})];
         selectEffect(0);
@@ -665,7 +657,6 @@ function importLibrary(text) {
     selectEffect(first);
 }
 
-///////////////////////////////////////////////////////////////////////////////
 // texture: tile picker, custom image and the default texture
 
 let defaultTextureInfo; // tiles.png, captured at startup
@@ -820,7 +811,6 @@ function refreshTexture() {
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
 function gameInit() {
     new Render3DPlugin;
     setGravity(vec2(0, -.01));
@@ -836,7 +826,6 @@ function gameInit() {
     selectEffect(loadLibrary());
 }
 
-///////////////////////////////////////////////////////////////////////////////
 function gameUpdate() {
     // a finished one shot effect plays again after a second
     if (emitter.destroyed) {
@@ -857,7 +846,6 @@ function gameUpdate() {
     emitter.pos = pos;
 }
 
-///////////////////////////////////////////////////////////////////////////////
 function gameUpdatePost() {
     // the 3D camera turns with a drag and zooms with the wheel, only when
     // they start in the preview; it updates itself unless paused
@@ -881,7 +869,6 @@ function gameUpdatePost() {
         $('particleCount').textContent = count;
 }
 
-///////////////////////////////////////////////////////////////////////////////
 function gameRender() {
     // show the floor the particles land on
     if (floorLayer) {
@@ -890,11 +877,8 @@ function gameRender() {
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
-function gameRenderPost() {
-}
+function gameRenderPost() {}
 
-///////////////////////////////////////////////////////////////////////////////
 // startup LittleJS engine, drawing into the preview area
 engineInit(gameInit, gameUpdate, gameUpdatePost, gameRender, gameRenderPost,
     ['tiles.png'], $('previewArea'));
