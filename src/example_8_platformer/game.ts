@@ -1,12 +1,8 @@
-/*
-    Little JS Platforming Game
-    - A basic platforming starter project
-    - Platforming physics and controls
-    - Includes destructible terrain
-    - Control with keyboard, mouse, touch, or gamepad
-*/
-
-'use strict';
+/**
+ *  2D JS Platforming Game:
+ *     - Includes destructible terrain
+ *     - Control with keyboard, mouse, touch, or gamepad
+ */
 
 import * as GameObjects from './gameObjects.js';
 import * as GameEffects from './gameEffects.js';
@@ -34,7 +30,7 @@ LJS.setTouchGamepadEnable(true);
 LJS.setCanvasMinAspect(.4);
 LJS.setCanvasMaxAspect(2.5);
 
-///////////////////////////////////////////////////////////////////////////////
+
 function loadLevel() {
     // setup level
     GameLevel.buildLevel();
@@ -55,7 +51,7 @@ function loadLevel() {
     score = deaths = 0;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+
 async function gameInit() {
     // load the game level data
     gameLevelData = await LJS.fetchJSON('gameLevelData.json');
@@ -93,7 +89,7 @@ async function gameInit() {
     };
 }
 
-///////////////////////////////////////////////////////////////////////////////
+
 function gameUpdate() {
     // respawn player
     if (player.deadTimer > 1) {
@@ -128,15 +124,15 @@ function gameUpdate() {
         loadLevel();
 }
 
-///////////////////////////////////////////////////////////////////////////////
+
 function gameUpdatePost() {
 }
 
-///////////////////////////////////////////////////////////////////////////////
+
 function gameRender() {
 }
 
-///////////////////////////////////////////////////////////////////////////////
+
 function gameRenderPost() {
     // draw to main canvas for hud rendering
     const drawText = (text, x, y, size = 40) => {
@@ -153,6 +149,6 @@ function gameRenderPost() {
     drawText('Deaths: ' + deaths, LJS.mainCanvasSize.x * 3 / 4, 20);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Startup LittleJS Engine
+
+// Starting up the engine
 LJS.engineInit(gameInit, gameUpdate, gameUpdatePost, gameRender, gameRenderPost, ['tiles.png', 'tilesLevel.png']);

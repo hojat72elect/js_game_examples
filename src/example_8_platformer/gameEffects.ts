@@ -6,28 +6,22 @@
     - Draws the sky, a gradient with stars
     - Tracks zzfx sound effects
 */
-
-'use strict';
-
 import * as GameLevel from './gameLevel.js';
 import * as LJS from "littlejsengine";
 
 const {vec2, hsl} = LJS;
 
-///////////////////////////////////////////////////////////////////////////////
 // sound effects
+export const sound_shoot = new LJS.Sound([undefined, undefined, 90, undefined, .01, .03, 4, undefined, undefined, undefined, undefined, undefined, undefined, 9, 50, .2, undefined, .2, .01]);
+export const sound_destroyObject = new LJS.Sound([.5, undefined, 1e3, .02, undefined, .2, 1, 3, .1, undefined, undefined, undefined, undefined, 1, -30, .5, undefined, .5]);
+export const sound_die = new LJS.Sound([.5, .4, 126, .05, undefined, .2, 1, 2.09, undefined, -4, undefined, undefined, 1, 1, 1, .4, .03]);
+export const sound_jump = new LJS.Sound([.4, .2, 250, .04, undefined, .04, undefined, undefined, 1, undefined, undefined, undefined, undefined, 3]);
+export const sound_dodge = new LJS.Sound([.4, .2, 150, .05, undefined, .05, undefined, undefined, -1, undefined, undefined, undefined, undefined, 4, undefined, undefined, undefined, undefined, .02]);
+export const sound_walk = new LJS.Sound([.3, .1, 50, .005, undefined, .01, 4, undefined, undefined, undefined, undefined, undefined, undefined, undefined, 10, undefined, undefined, .5]);
+export const sound_explosion = new LJS.Sound([2, .2, 72, .01, .01, .2, 4, undefined, undefined, undefined, undefined, undefined, undefined, 1, undefined, .5, .1, .5, .02]);
+export const sound_grenade = new LJS.Sound([.5, .01, 300, undefined, undefined, .02, 3, .22, undefined, undefined, -9, .2, undefined, undefined, undefined, undefined, undefined, .5]);
+export const sound_score = new LJS.Sound([undefined, undefined, 783, undefined, .03, .02, 1, 2, undefined, undefined, 940, .03, undefined, undefined, undefined, undefined, .2, .6, undefined, .06]);
 
-export const sound_shoot = new LJS.Sound([, , 90, , .01, .03, 4, , , , , , , 9, 50, .2, , .2, .01]);
-export const sound_destroyObject = new LJS.Sound([.5, , 1e3, .02, , .2, 1, 3, .1, , , , , 1, -30, .5, , .5]);
-export const sound_die = new LJS.Sound([.5, .4, 126, .05, , .2, 1, 2.09, , -4, , , 1, 1, 1, .4, .03]);
-export const sound_jump = new LJS.Sound([.4, .2, 250, .04, , .04, , , 1, , , , , 3]);
-export const sound_dodge = new LJS.Sound([.4, .2, 150, .05, , .05, , , -1, , , , , 4, , , , , .02]);
-export const sound_walk = new LJS.Sound([.3, .1, 50, .005, , .01, 4, , , , , , , , 10, , , .5]);
-export const sound_explosion = new LJS.Sound([2, .2, 72, .01, .01, .2, 4, , , , , , , 1, , .5, .1, .5, .02]);
-export const sound_grenade = new LJS.Sound([.5, .01, 300, , , .02, 3, .22, , , -9, .2, , , , , , .5]);
-export const sound_score = new LJS.Sound([, , 783, , .03, .02, 1, 2, , , 940, .03, , , , , .2, .6, , .06]);
-
-///////////////////////////////////////////////////////////////////////////////
 // special effects
 
 export const persistentParticleDestroyCallback = (particle) => {
@@ -58,7 +52,6 @@ export function makeDebris(pos, color = hsl(), amount = 50, size = .2, restituti
     return emitter;
 }
 
-///////////////////////////////////////////////////////////////////////////////
 
 export function explosion(pos, radius = 3) {
     LJS.ASSERT(radius > 0);
@@ -125,7 +118,6 @@ export function explosion(pos, radius = 3) {
     );
 }
 
-///////////////////////////////////////////////////////////////////////////////
 
 export function destroyTile(pos, makeSound = 1, cleanup = 1) {
     // pos must be an int
@@ -163,7 +155,6 @@ export function destroyTile(pos, makeSound = 1, cleanup = 1) {
     return true;
 }
 
-///////////////////////////////////////////////////////////////////////////////
 // sky with background gradient and stars
 
 export class Sky extends LJS.EngineObject {
@@ -199,4 +190,3 @@ export class Sky extends LJS.EngineObject {
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////

@@ -1,16 +1,12 @@
-/*
-    LittleJS Platformer Example - Character
-    - Platform style character
-    - Handles animation and sound effects
-    - Uses special platforming physics system
-    - Characters can jump, shoot, roll, and throw grenades
-    - Characters can climb ladders and break blocks
-    - Characters also have a damage and can die
-    - Has a weapon which can be fired
-*/
-
-'use strict';
-
+/**
+ * The character that can be used in a typical platformer game:
+ *     - Handles animation and sound effects
+ *     - Uses special platforming physics system
+ *     - Characters can jump, shoot, roll, and throw grenades
+ *     - Characters can climb ladders and break blocks
+ *     - Characters also have a damage meter and can die
+ *     - Has a weapon which can fire bullets
+ */
 import * as GameObjects from './gameObjects.js';
 import * as GameEffects from './gameEffects.js';
 import * as GameLevel from './gameLevel.js';

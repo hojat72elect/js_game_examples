@@ -1,12 +1,9 @@
 /*
-    LittleJS Platformer Example - Level Generator
-    - Procedurally generates level geometry
-    - Picks colors for the level and background
-    - Creates ladders and spawns enemies and crates
+    Level Generator
+    - Procedurally generates level geometry.
+    - Picks colors for the level and background.
+    - Creates ladders and spawns enemies and crates.
 */
-
-'use strict';
-
 import * as GameObjects from './gameObjects.js';
 import * as GameEffects from './gameEffects.js';
 import * as Game from './game.js';
