@@ -3,10 +3,17 @@
  */
 import {
     cameraPos,
-    drawRect, engineImageFont, engineInit,
+    drawRect,
+    engineImageFont,
+    engineInit,
     engineObjectsDestroy,
     gamepadWasPressed,
-    hsl, keyWasPressed, mouseWasPressed, postProcessEffects, PostProcessPlugin, postProcessTV,
+    hsl,
+    keyWasPressed,
+    mouseWasPressed,
+    postProcessEffects,
+    PostProcessPlugin,
+    postProcessTV,
     setCameraPos,
     setCameraScale,
     setCanvasFixedSize,
@@ -15,10 +22,14 @@ import {
 import {Ball, Brick, Paddle, Wall} from "./gameObjects.ts";
 
 // game objects
-export let ball, score, brickCount, paddle;
+export let ball: any;
+export let score: number;
+export let brickCount: number;
+export let paddle: Paddle;
+
 export const levelSize = vec2(38, 20);
 
-export function changeBrickCount(delta) {
+export function changeBrickCount(delta: number) {
     brickCount += delta;
 
     // increase score when brick is destroyed
@@ -77,7 +88,8 @@ function gameUpdate() {
         gameReset();
 }
 
-function gameUpdatePost() {}
+function gameUpdatePost() {
+}
 
 function gameRender() {
     // draw a the background
