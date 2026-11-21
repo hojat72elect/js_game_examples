@@ -6,24 +6,40 @@
  *     - Supports keyboard, mouse, and gamepad controls
  *     - Keeps track of player deaths
  */
-import * as GameCharacter from './gameCharacter.js';
-import * as Game from './game.js';
-import * as LJS from "littlejsengine";
+import {
+    gamepadIsDown,
+    gamepadStick,
+    isUsingGamepad,
+    keyDirection,
+    keyIsDown,
+    mouseIsDown,
+    Vector2
+} from "littlejsengine";
+import {addToDeaths} from "./game.ts";
+import {Character} from "./gameCharacter.ts";
 
-export class Player extends GameCharacter.Character {
-    update() {
-        // movement control
-        const mouseMode = !LJS.isUsingGamepad;
-        this.moveInput = LJS.isUsingGamepad ? LJS.gamepadStick(0) : LJS.keyDirection();
-        this.holdingJump = LJS.keyIsDown('ArrowUp') || LJS.gamepadIsDown(0);
-        this.holdingShoot = mouseMode && LJS.mouseIsDown(0) || LJS.keyIsDown('KeyZ') || LJS.gamepadIsDown(2);
-        this.pressingThrow = mouseMode && LJS.mouseIsDown(1) || LJS.keyIsDown('KeyC') || LJS.gamepadIsDown(1);
-        this.pressedDodge = mouseMode && LJS.mouseIsDown(2) || LJS.keyIsDown('KeyX') || LJS.gamepadIsDown(3);
+export class Player extends Character {
+    moveInput: Vector2 = new Vector2(0, 0);
+    holdingJump: boolean = false;
+    holdingShoot: boolean = false;
+    pressingThrow: boolean = false;
+    pressedDodge: boolean = false;
+
+    /**
+     * We're going to use this function for controlling the movement of the player.
+     */
+    override update() {
+        const mouseMode = !isUsingGamepad;
+        this.moveInput = isUsingGamepad ? gamepadStick(0) : keyDirection();
+        this.holdingJump = keyIsDown('ArrowUp') || gamepadIsDown(0);
+        this.holdingShoot = mouseMode && mouseIsDown(0) || keyIsDown('KeyZ') || gamepadIsDown(2);
+        this.pressingThrow = mouseMode && mouseIsDown(1) || keyIsDown('KeyC') || gamepadIsDown(1);
+        this.pressedDodge = mouseMode && mouseIsDown(2) || keyIsDown('KeyX') || gamepadIsDown(3);
         super.update();
     }
 
-    kill(damagingObject) {
-        this.isDead() || Game.addToDeaths(); // a death counted once
+    override kill(damagingObject: any) {
+        this.isDead() || addToDeaths(); // a death counted once
         super.kill(damagingObject); // fall away from what killed the player
     }
 }
