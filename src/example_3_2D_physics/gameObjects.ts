@@ -1,25 +1,19 @@
-/*
-    Little JS Box2d Demo Objects
-    - Object functions that use Box2D features
-    - Feel free to copy and paste these into your own project
-*/
+/**
+ * Little JS Box2d Demo Objects
+ */
 
-'use strict';
-
-// import LittleJS module
-import * as Game from './game.js';
+import * as Game from './game.ts';
+import type {Vector2} from "littlejsengine";
 import * as LJS from "littlejsengine";
 
 const {vec2, hsl, PI} = LJS;
 
-///////////////////////////////////////////////////////////////////////////////
 // spawn object functions
-
 const density = 1;
 const friction = .5;
 const restitution = .2;
 
-export function spawnBox(pos, size = 1, color = LJS.WHITE, type = LJS.box2d.bodyTypeDynamic, applyTexture = false, angle = 0) {
+export function spawnBox(pos: LJS.Vector2, size: LJS.Vector2 | number = 1, color = LJS.WHITE, type = LJS.box2d.bodyTypeDynamic, applyTexture = false, angle = 0) {
     size = typeof size === 'number' ? vec2(size) : size; // square
     const o = new LJS.Box2dObject(pos, size, applyTexture && Game.spriteAtlas.squareOutline, angle, color, type);
     o.drawSize = size.scale(1.02); // slightly enlarge to cover gaps
@@ -27,20 +21,21 @@ export function spawnBox(pos, size = 1, color = LJS.WHITE, type = LJS.box2d.body
     return o;
 }
 
-export function spawnCircle(pos, diameter = 1, color = LJS.WHITE, type = LJS.box2d.bodyTypeDynamic, applyTexture = false, angle = 0) {
+export function spawnCircle(pos: Vector2, diameter = 1, color = LJS.WHITE, type = LJS.box2d.bodyTypeDynamic, applyTexture = false, angle = 0) {
     const size = vec2(diameter);
     const o = new LJS.Box2dObject(pos, size, applyTexture && Game.spriteAtlas.circleOutline, angle, color, type);
     o.addCircle(diameter, vec2(), density, friction, restitution);
     return o;
 }
 
-export function spawnRandomPoly(pos, diameter = 1, color = LJS.WHITE, type = LJS.box2d.bodyTypeDynamic, angle = 0) {
+export function spawnRandomPoly(pos: Vector2, diameter = 1, color = LJS.WHITE, type = LJS.box2d.bodyTypeDynamic, angle = 0) {
+    // @ts-ignore
     const o = new LJS.Box2dObject(pos, vec2(), 0, angle, color, type);
     o.addRandomPoly(diameter, density, friction, restitution);
     return o;
 }
 
-export function spawnRandomObject(pos, scale = 1, type = LJS.box2d.bodyTypeDynamic, angle = 0) {
+export function spawnRandomObject(pos: any, scale = 1, type = LJS.box2d.bodyTypeDynamic, angle = 0) {
     if (LJS.randInt(2)) {
         const size = vec2(scale * LJS.rand(.5, 1), scale * LJS.rand(.5, 1));
         return spawnBox(pos, size, LJS.randColor(), type, true, angle);
@@ -50,13 +45,13 @@ export function spawnRandomObject(pos, scale = 1, type = LJS.box2d.bodyTypeDynam
     }
 }
 
-export function spawnPyramid(pos, count) {
+export function spawnPyramid(pos: Vector2, count: number) {
     for (let i = count + 1; i--;)
         for (let j = i; j--;)
             spawnBox(pos.add(vec2(j - i / 2 + .5, count - i + .5)), 1, LJS.randColor());
 }
 
-export function spawnDominoes(pos, count, size = vec2(.5, 3)) {
+export function spawnDominoes(pos: any, count: any, size = vec2(.5, 3)) {
     for (let i = count; i--;)
         spawnBox(pos.add(vec2(i * size.y * .9, size.y / 2)), size, LJS.randColor());
 }
@@ -72,7 +67,7 @@ export function spawnRandomEdges() {
     o.addEdgeList(edgePoints);
 }
 
-export function spawnRope(startPos, count, angle = PI, color = LJS.WHITE, size = vec2(.3, 1)) {
+export function spawnRope(startPos: Vector2, count: number, angle = PI, color = LJS.WHITE, size = vec2(.3, 1)) {
     let lastObject = Game.groundObject;
     for (let i = 0; i < count; ++i) {
         const pos = startPos.add(size.multiply(vec2(0, i + .5)).rotate(-angle));
@@ -87,11 +82,15 @@ export function spawnRope(startPos, count, angle = PI, color = LJS.WHITE, size =
     return lastObject;
 }
 
-///////////////////////////////////////////////////////////////////////////////
 
 // simple car vehicle using wheel joints
 export class CarObject extends LJS.Box2dObject {
-    constructor(pos) {
+
+    wheels: LJS.Box2dObject[];
+    wheelMotorJoint: LJS.Box2dWheelJoint | undefined;
+
+    constructor(pos: any) {
+        // @ts-ignore
         super(pos, vec2(), 0, 0, LJS.randColor());
         const carPoints = [
             vec2(-1.5, -.5),
@@ -113,7 +112,7 @@ export class CarObject extends LJS.Box2dObject {
         const maxTorque = 35;
         const sprite = Game.spriteAtlas.wheel;
         this.wheels = [];
-        const makeWheel = (pos, isMotor) => {
+        const makeWheel = (pos: any, isMotor: boolean = false) => {
             const wheel = new LJS.Box2dObject(pos, vec2(diameter), sprite);
             const joint = new LJS.Box2dWheelJoint(this, wheel);
             joint.setSpringDampingRatio(damping);
@@ -135,9 +134,9 @@ export class CarObject extends LJS.Box2dObject {
         // car controls
         const maxSpeed = 40;
         const input = LJS.keyDirection().x;
-        let s = this.wheelMotorJoint.getMotorSpeed();
-        s = input ? LJS.clamp(s + input, -maxSpeed, maxSpeed) : 0;
-        this.wheelMotorJoint.setMotorSpeed(s);
+        let s = this.wheelMotorJoint?.getMotorSpeed();
+        s = input ? LJS.clamp(s! + input, -maxSpeed, maxSpeed) : 0;
+        this.wheelMotorJoint?.setMotorSpeed(s);
     }
 
     destroy() {
@@ -146,31 +145,37 @@ export class CarObject extends LJS.Box2dObject {
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
 
 // changes objects color when touched
 export class ContactTester extends LJS.Box2dStaticObject {
-    constructor(pos, size, color, contactColor, isCircle = true, isSensor = true) {
+
+    contactColor: any
+
+    constructor(pos: any, size: any, color: any, contactColor: any, isCircle = true, isSensor = true) {
+        // @ts-ignore
         super(pos, size, 0, 0, color);
         isCircle ? this.addCircle(size.x) : this.addBox(size);
         this.setSensor(isSensor);
         this.contactColor = contactColor;
     }
 
-    beginContact(other) {
+    beginContact(other: any) {
         other.color = this.contactColor;
     }
 
-    endContact(other) {
+    endContact(other: any) {
         other.color = LJS.WHITE;
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
 
 // balanced recursive mobile object with revolve joints
 export class MobileObject extends LJS.Box2dObject {
-    constructor(anchor, w, h, depth) {
+
+    childMobiles;
+
+    constructor(anchor: any, w: any, h: any, depth: any) {
+        // @ts-ignore
         super(anchor, vec2(w, h), 0, 0, LJS.randColor());
         this.addBox(vec2(h / 4, h), vec2(0, -h / 2));
         this.childMobiles = [];
@@ -193,11 +198,13 @@ export class MobileObject extends LJS.Box2dObject {
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
 
 // pulley object renders a rope to connected point
 export class PulleyJointObjects extends LJS.Box2dObject {
-    constructor(pos, size, color, connectionPos) {
+
+    connectionPos;
+
+    constructor(pos: any, size: any, color: any, connectionPos: any) {
         super(pos, size, Game.spriteAtlas.squareOutline, 0, color);
         this.addBox(size);
         this.connectionPos = connectionPos;
@@ -211,11 +218,13 @@ export class PulleyJointObjects extends LJS.Box2dObject {
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
 
 // motor object renders a rope to connected point
 export class MotorJointObject extends LJS.Box2dObject {
-    constructor(pos, size, color, otherObject) {
+
+    connectionPos;
+
+    constructor(pos: any, size: any, color: any, otherObject: any) {
         super(pos, size, Game.spriteAtlas.wheel, 0, color);
         this.addCircle(size.x);
         this.connectionPos = pos;
@@ -232,12 +241,14 @@ export class MotorJointObject extends LJS.Box2dObject {
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
 
 // soft body sim using grid of weld joints
-export class SoftBodyObject extends LJS.Box2dStaticObject // holds the nodes, it does not fall
-{
-    constructor(pos, scale, sizeCount, color) {
+// holds the nodes, it does not fall
+export class SoftBodyObject extends LJS.Box2dStaticObject {
+    sizeCount;
+    nodes;
+
+    constructor(pos: any, scale: any, sizeCount: any, color: any) {
         super(pos, vec2());
         const nodeSize = sizeCount.subtract(vec2(1));
         const spacing = scale.divide(nodeSize);
@@ -255,6 +266,7 @@ export class SoftBodyObject extends LJS.Box2dStaticObject // holds the nodes, it
                 o.addCircle(objectDiameter);
                 o.setMass(mass);
                 o.setAngularDamping(10);
+                // @ts-ignore
                 o.joints = [];
                 this.nodes.push(o);
             }
@@ -262,9 +274,10 @@ export class SoftBodyObject extends LJS.Box2dStaticObject // holds the nodes, it
         for (let y = sizeCount.y; y--;)
             for (let x = sizeCount.x; x--;) {
                 const o = this.getNode(x, y);
-                const tryAddJoint = (xo, yo) => {
+                const tryAddJoint = (xo: any, yo: any) => {
                     const o2 = this.getNode(x + xo, y + yo);
-                    const joint = o2 ? new LJS.Box2dWeldJoint(o, o2) : 0;
+                    const joint = o2 ? new LJS.Box2dWeldJoint(o!, o2) : 0;
+                    // @ts-ignore
                     o.joints.push(joint);
                 }
 
@@ -279,14 +292,14 @@ export class SoftBodyObject extends LJS.Box2dStaticObject // holds the nodes, it
         const poly = [];
         const sx = this.sizeCount.x;
         const sy = this.sizeCount.y;
-        for (let x = 0; x < sx; ++x) poly.push(this.getNode(x, 0).pos);
-        for (let y = 0; y < sy; ++y) poly.push(this.getNode(sx - 1, y).pos);
-        for (let x = sx; x--;) poly.push(this.getNode(x, sy - 1).pos);
-        for (let y = sy; y--;) poly.push(this.getNode(0, y).pos);
+        for (let x = 0; x < sx; ++x) poly.push(this.getNode(x, 0)!.pos);
+        for (let y = 0; y < sy; ++y) poly.push(this.getNode(sx - 1, y)!.pos);
+        for (let x = sx; x--;) poly.push(this.getNode(x, sy - 1)!.pos);
+        for (let y = sy; y--;) poly.push(this.getNode(0, y)!.pos);
         LJS.drawPoly(poly, LJS.BLACK)
     }
 
-    getNode(x, y) {
+    getNode(x: number, y: number) {
         if (vec2(x, y).arrayCheck(this.sizeCount))
             return this.nodes[y * this.sizeCount.x + x];
     }
@@ -297,11 +310,16 @@ export class SoftBodyObject extends LJS.Box2dStaticObject // holds the nodes, it
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
 
 // cloth sim using grid of rope joints
 export class ClothObject extends LJS.Box2dStaticObject {
-    constructor(pos, scale, sizeCount, color, maxJointStress = 10) {
+
+    sizeCount;
+    maxJointStress;
+    nodes;
+
+    constructor(pos: any, scale: any, sizeCount: any, color: any, maxJointStress: number = 10) {
+        // @ts-ignore
         super(pos, vec2(), 0, 0, color);
         const nodeSize = sizeCount.subtract(vec2(1));
         const spacing = scale.divide(nodeSize);
@@ -322,6 +340,7 @@ export class ClothObject extends LJS.Box2dStaticObject {
                 o.setFilterData(2, 2);
                 o.setLinearDamping(1);
                 o.setMass(mass);
+                // @ts-ignore
                 o.joints = [];
                 this.nodes.push(o);
             }
@@ -333,9 +352,10 @@ export class ClothObject extends LJS.Box2dStaticObject {
                     const d = y % 2 ? 1 : -1;
                     const x2 = d > 0 ? x : sizeCount.x - 1 - x;
                     const o = this.getNode(x2, y);
-                    const tryAddJoint = (xo, yo) => {
+                    const tryAddJoint = (xo: any, yo: any) => {
                         const o2 = this.getNode(x2 + xo, y + yo);
-                        const joint = o2 ? new LJS.Box2dRopeJoint(o, o2) : 0;
+                        const joint = o2 ? new LJS.Box2dRopeJoint(o!, o2) : 0;
+                        // @ts-ignore
                         o.joints.push(joint);
                     }
 
@@ -349,12 +369,12 @@ export class ClothObject extends LJS.Box2dStaticObject {
                         tryAddJoint(d, 1);
 
                         // attach pin joint to top row
-                        y || new LJS.Box2dPinJoint(this.getNode(x, y), this);
+                        y || new LJS.Box2dPinJoint(this.getNode(x, y)!, this);
                     }
                 }
     }
 
-    getNode(x, y) {
+    getNode(x: any, y: any) {
         if (vec2(x, y).arrayCheck(this.sizeCount))
             return this.nodes[y * this.sizeCount.x + x];
     }
@@ -366,6 +386,7 @@ export class ClothObject extends LJS.Box2dStaticObject {
                 if (!o) continue;
 
                 // check node joints
+                // @ts-ignore
                 const joints = o.joints;
                 for (let i = joints.length; i--;) {
                     const j = joints[i];
@@ -385,6 +406,7 @@ export class ClothObject extends LJS.Box2dStaticObject {
                 if (!o.hasJoints()) {
                     // destroy if not connected to anything
                     o.destroy();
+                    // @ts-ignore
                     this.nodes[y * this.sizeCount.x + x] = 0;
                 }
             }
@@ -394,6 +416,7 @@ export class ClothObject extends LJS.Box2dStaticObject {
         // draw connections
         for (const o of this.nodes) {
             if (!o) continue;
+            // @ts-ignore
             for (const joint of o.joints) {
                 if (!joint) continue;
                 const oA = joint.getObjectA();
@@ -409,11 +432,13 @@ export class ClothObject extends LJS.Box2dStaticObject {
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
 
 // ragdoll with head, arms, and legs connected to torso by revolute joints
 export class RagdollObject extends LJS.Box2dObject {
-    constructor(pos, scale = 1, color = LJS.randColor()) {
+
+    limbs: any[];
+
+    constructor(pos: any, scale = 1, color = LJS.randColor()) {
         const headSize = .8 * scale;
         const torsoWidth = 1.2 * scale;
         const torsoHeight = 2 * scale;
@@ -424,11 +449,13 @@ export class RagdollObject extends LJS.Box2dObject {
         const lowerLegLen = 1.1 * scale;
 
         // torso is the main body
+        // @ts-ignore
         super(pos, vec2(torsoWidth, torsoHeight), 0, 0, color);
         this.addBox(vec2(torsoWidth, torsoHeight), vec2(), 0, density, friction, restitution);
         this.limbs = [];
 
-        const addLimb = (offset, size, isCircle = false) => {
+        const addLimb = (offset: any, size: any, isCircle = false) => {
+            // @ts-ignore
             const o = new LJS.Box2dObject(pos.add(offset), size, 0, 0, color);
             if (isCircle)
                 o.addCircle(size.x, vec2(), density, friction, restitution);
@@ -437,7 +464,7 @@ export class RagdollObject extends LJS.Box2dObject {
             this.limbs.push(o);
             return o;
         };
-        const addJoint = (a, b, anchor, lower, upper) => {
+        const addJoint = (a: any, b: any, anchor: any, lower: any, upper: any) => {
             const joint = new LJS.Box2dRevoluteJoint(a, b, anchor);
             joint.enableLimit();
             joint.setLimits(lower, upper);
@@ -477,12 +504,12 @@ export class RagdollObject extends LJS.Box2dObject {
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
+
 // Effects
 
-const sound_explosion = new LJS.Sound([.5, .2, 72, .01, .01, .2, 4,undefined , undefined,undefined , undefined,undefined , undefined, 1,undefined , .5, .1, .5, .02]);
+const sound_explosion = new LJS.Sound([.5, .2, 72, .01, .01, .2, 4, undefined, undefined, undefined, undefined, undefined, undefined, 1, undefined, .5, .1, .5, .02]);
 
-export function explosion(pos, radius = 3, strength = 300) {
+export function explosion(pos: any, radius = 3, strength = 300) {
     sound_explosion.play(pos);
     // circleCastAll takes a diameter, so this finds objects within 2*radius,
     // full force inside radius and falling to none at 2*radius
@@ -504,6 +531,7 @@ export function explosion(pos, radius = 3, strength = 300) {
         hsl(0, 0, 0, 0), hsl(0, 0, 0, 0),   // colorEndA, colorEndB
         1, 1, 2, .1, .1,      // time, sizeStart, sizeEnd, speed, angleSpeed
         .9, 1, 0, PI, .1,     // damp, angleDamp, gravity, particleCone, fade
+        // @ts-ignore
         1, 0, 0, 0, 1e8       // randomness, collide, additive, colorLinear, renderOrder
     );
     // the engine's gravity is in Box2D units here, far stronger than a
@@ -511,6 +539,7 @@ export function explosion(pos, radius = 3, strength = 300) {
     smoke.gravity = .005;
 
     // fire
+
     new LJS.ParticleEmitter(
         pos, 0,                        // pos, angle
         radius, .1, 100 * radius, PI,    // emitSize, emitTime, rate, cone
@@ -519,6 +548,7 @@ export function explosion(pos, radius = 3, strength = 300) {
         hsl(0, 1, .5, 0), hsl(.1, 1, .5, 0),// colorEndA, colorEndB
         .7, 1, .5, .1, .1,   // time, sizeStart, sizeEnd, speed, angleSpeed
         .9, 1, 0, PI, .05,   // damp, angleDamp, gravity, particleCone, fade
+        // @ts-ignore
         1, 0, 1, 0, 1e9      // randomness, collide, additive, colorLinear, renderOrder
     );
 }

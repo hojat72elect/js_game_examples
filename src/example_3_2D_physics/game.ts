@@ -9,11 +9,10 @@
     - User Interaction
 */
 
-'use strict';
 
 // import LittleJS module
-import * as GameObjects from './gameObjects.js';
-import * as Scenes from './scenes.js';
+import * as GameObjects from './gameObjects.ts';
+import * as Scenes from './scenes.ts';
 import * as LJS from "littlejsengine";
 
 const {vec2, hsl} = LJS;
@@ -22,22 +21,25 @@ const {vec2, hsl} = LJS;
 LJS.setCanvasPixelated(false);
 LJS.setTilesPixelated(false);
 
-///////////////////////////////////////////////////////////////////////////////
+
 // game variables
 
 const sceneCount = 12;
 const startScene = 0;
-export let spriteAtlas, groundObject, mouseJoint, repeatSpawnTimer = new LJS.Timer;
+export let spriteAtlas: any;
+export let groundObject: LJS.Box2dObject;
+export let mouseJoint: any;
+export let repeatSpawnTimer = new LJS.Timer;
 const sound_click = new LJS.Sound([.2, .1, undefined, undefined, undefined, .01, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, -500]);
 
-///////////////////////////////////////////////////////////////////////////////
+
 // each demo scene is a scene for the scene system, setScene destroys the old
 // scene's objects and its enter builds the new one
-const demoScenes = [];
+const demoScenes: object[] = [];
 for (let i = 0; i < sceneCount; ++i)
     demoScenes.push({enter: () => loadDemoScene(i)});
 
-function loadDemoScene(scene) {
+function loadDemoScene(scene: number) {
     // setup
     LJS.setCameraPos(vec2(20, 10));
     LJS.setGravity(vec2(0, -20));
@@ -53,14 +55,14 @@ function loadDemoScene(scene) {
     Scenes.loadScene(scene);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+
 async function gameInit() {
     // start up LittleJS Box2D plugin
     await LJS.box2dInit();
     //LJS.box2dSetDebug(true); // enable box2d debug draw
 
     // create a table of all sprites
-    const gameTile = (i) => LJS.tile(i, 124, 0, 2);
+    const gameTile = (i: number) => LJS.tile(i, 124, 0, 2);
     spriteAtlas =
         {
             circle: gameTile(0),
@@ -77,7 +79,7 @@ async function gameInit() {
     LJS.setScene(demoScenes[startScene]);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+
 function gameUpdate() {
     // scale canvas to fit based on 1080p
     LJS.setCameraScale(LJS.mainCanvasSize.y * 48 / 1080);
@@ -122,12 +124,12 @@ function gameUpdate() {
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
+
 function gameUpdatePost() {
 
 }
 
-///////////////////////////////////////////////////////////////////////////////
+
 function gameRender() {
     if (Scenes.scene === 5) {
         // raycast test
@@ -143,7 +145,7 @@ function gameRender() {
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
+
 function gameRenderPost() {
     if (mouseJoint) {
         // draw mouse joint
@@ -167,13 +169,11 @@ function gameRenderPost() {
         drawText('Left = Reverse');
     }
 
-    function drawText(text, size = 40, gap = 50) {
+    function drawText(text: string, size = 40, gap = 50) {
         LJS.drawTextScreen(text, pos, size, LJS.WHITE, size * .1);
         pos.y += gap;
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Startup LittleJS Engine with Box2D
-
+// Starting up the engine with Box2D
 LJS.engineInit(gameInit, gameUpdate, gameUpdatePost, gameRender, gameRenderPost, ['tiles.png']);

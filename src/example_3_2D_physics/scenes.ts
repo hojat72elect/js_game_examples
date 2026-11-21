@@ -16,18 +16,17 @@
     - 11 = Ragdolls
 */
 
-'use strict';
-
 // import game module
-import * as GameObjects from './gameObjects.js';
-import * as Game from './game.js';
+import * as GameObjects from './gameObjects.ts';
+import * as Game from './game.ts';
 import * as LJS from "littlejsengine";
 
 const {vec2} = LJS;
 
-export let scene, sceneName;
+export let scene: any;
+export let sceneName: string;
 
-export function loadScene(_scene) {
+export function loadScene(_scene:any) {
     scene = _scene;
 
     if (scene === 0) {
@@ -92,7 +91,9 @@ export function loadScene(_scene) {
             new LJS.Box2dPrismaticJoint(Game.groundObject, o2, o2.pos, vec2(0, 1), true);
 
             // lines to make it look line a track
+            // @ts-ignore
             const l1 = new LJS.EngineObject(vec2(20, 8), vec2(39, .5), 0, 0, LJS.GRAY);
+            // @ts-ignore
             const l2 = new LJS.EngineObject(vec2(20, 50), vec2(.5, 99), 0, 0, LJS.GRAY);
             l1.gravityScale = l2.gravityScale = 0;
             l1.renderOrder = l2.renderOrder = -2;
@@ -110,6 +111,7 @@ export function loadScene(_scene) {
             new LJS.Box2dPulleyJoint(oA, oB, aA.pos, aB.pos, oaA, oaB);
 
             // a line to make it look like connecting rope
+            // @ts-ignore
             const line = new LJS.EngineObject(vec2(20, 15), vec2(10, .2), 0, 0, LJS.BLACK);
             line.gravityScale = 0;
             line.renderOrder = -1;
