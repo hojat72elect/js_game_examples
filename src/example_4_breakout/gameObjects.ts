@@ -1,22 +1,26 @@
-/*
-    LittleJS Breakout Objects
-*/
+import {
+    clamp,
+    EngineObject,
+    gamepadStick,
+    hsl,
+    isUsingGamepad,
+    max,
+    min,
+    mousePos,
+    ParticleEmitter,
+    randColor,
+    Sound,
+    tile,
+    vec2
+} from "littlejsengine";
+import {changeBrickCount, levelSize, paddle} from "./game.ts";
 
-'use strict';
-
-import * as Game from './game.js';
-import * as LJS from "littlejsengine";
-
-const {tile, vec2, hsl} = LJS;
-
-///////////////////////////////////////////////////////////////////////////////
 // sound effects
-const sound_start = new LJS.Sound([undefined, 0, 500, undefined, .04, .3, 1, 2, undefined, undefined, 570, .02, .02, undefined, undefined, undefined, .04]);
-const sound_break = new LJS.Sound([undefined, undefined, 90, undefined, .01, .03, 4, undefined, undefined, undefined, undefined, undefined, undefined, 9, 50, .2, undefined, .2, .01]);
-const sound_bounce = new LJS.Sound([undefined, undefined, 1e3, undefined, .03, .02, 1, 2, undefined, undefined, 940, .03, undefined, undefined, undefined, undefined, .2, .6, undefined, .06]);
+const sound_start = new Sound([undefined, 0, 500, undefined, .04, .3, 1, 2, undefined, undefined, 570, .02, .02, undefined, undefined, undefined, .04]);
+const sound_break = new Sound([undefined, undefined, 90, undefined, .01, .03, 4, undefined, undefined, undefined, undefined, undefined, undefined, 9, 50, .2, undefined, .2, .01]);
+const sound_bounce = new Sound([undefined, undefined, 1e3, undefined, .03, .02, 1, 2, undefined, undefined, 940, .03, undefined, undefined, undefined, undefined, .2, .6, undefined, .06]);
 
-///////////////////////////////////////////////////////////////////////////////
-export class PhysicsObject extends LJS.EngineObject {
+export class PhysicsObject extends EngineObject {
     constructor(pos, size, tileInfo, angle, color) {
         super(pos, size, tileInfo, angle, color);
         this.setCollision(); // make object collide
@@ -24,14 +28,12 @@ export class PhysicsObject extends LJS.EngineObject {
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
 export class Wall extends PhysicsObject {
     constructor(pos, size) {
         super(pos, size, 0, 0, hsl(0, 0, 0, 0));
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
 export class Paddle extends PhysicsObject {
     constructor(pos) {
         super(pos, vec2(5, .5));
@@ -39,30 +41,29 @@ export class Paddle extends PhysicsObject {
 
     update() {
         // control with gamepad or mouse
-        this.pos.x = LJS.isUsingGamepad ? this.pos.x + LJS.gamepadStick(0).x : LJS.mousePos.x;
+        this.pos.x = isUsingGamepad ? this.pos.x + gamepadStick(0).x : mousePos.x;
 
         // keep paddle in bounds of level
-        this.pos.x = LJS.clamp(this.pos.x, this.size.x / 2, Game.levelSize.x - this.size.x / 2);
+        this.pos.x = clamp(this.pos.x, this.size.x / 2, levelSize.x - this.size.x / 2);
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
 export class Brick extends PhysicsObject {
     constructor(pos) {
-        super(pos, vec2(2, 1), tile(1, vec2(32, 16)), 0, LJS.randColor());
-        Game.changeBrickCount(1);
+        super(pos, vec2(2, 1), tile(1, vec2(32, 16)), 0, randColor());
+        changeBrickCount(1);
     }
 
     collideWithObject(o) {
         // destroy brick when hit with ball
         this.destroy();
-        Game.changeBrickCount(-1);
+        changeBrickCount(-1);
         sound_break.play(this.pos);
 
         // make explosion effect
         const color1 = this.color;
         const color2 = color1.lerp(hsl(), .5);
-        new LJS.ParticleEmitter(
+        new ParticleEmitter(
             this.pos, 0,                          // pos, angle
             this.size, .1, 200, 3.14,             // emitSize, emitTime, rate, cone
             tile(0, 16),                          // tileInfo
@@ -83,7 +84,6 @@ export class Brick extends PhysicsObject {
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
 export class Ball extends PhysicsObject {
     constructor(pos) {
         super(pos, vec2(.5), tile(0));
@@ -95,7 +95,7 @@ export class Ball extends PhysicsObject {
 
         // attach a trail effect
         const color = hsl(0, 0, .2);
-        this.trailEffect = new LJS.ParticleEmitter(
+        this.trailEffect = new ParticleEmitter(
             this.pos, 0,                          // pos, angle
             this.size, 0, 80, 3.14,               // emitSize, emitTime, rate, cone
             tile(0, 16),                          // tileInfo
@@ -111,7 +111,7 @@ export class Ball extends PhysicsObject {
 
     collideWithObject(o) {
         // only need special handling when colliding with paddle
-        if (o !== Game.paddle)
+        if (o !== paddle)
             return true;
 
         // prevent colliding with paddle if moving upwards
@@ -120,10 +120,10 @@ export class Ball extends PhysicsObject {
 
         // put english on the ball when it collides with paddle
         this.velocity = this.velocity.rotate(.2 * (o.pos.x - this.pos.x));
-        this.velocity.y = LJS.max(-this.velocity.y, .2);
+        this.velocity.y = max(-this.velocity.y, .2);
 
         // speed up
-        const speed = LJS.min(1.04 * this.getSpeed(), .5);
+        const speed = min(1.04 * this.getSpeed(), .5);
         this.velocity = this.velocity.normalize(speed);
         sound_bounce.play(this.pos, 1, speed * 2);
 
