@@ -3,17 +3,41 @@
  *     - Includes destructible terrain
  *     - Control with keyboard, mouse, touch, or gamepad
  */
+import {
+    cameraScale,
+    clamp,
+    engineInit,
+    fetchJSON,
+    FollowCamera,
+    keyWasPressed,
+    levelEditor,
+    mainCanvasSize,
+    mainContext,
+    mousePos,
+    mouseWheel,
+    setCameraScale,
+    setCanvasMaxAspect,
+    setCanvasMinAspect,
+    setGravity,
+    setObjectDefaultAngleDamping,
+    setObjectDefaultDamping,
+    setTouchGamepadEnable,
+    tile,
+    vec2
+} from "littlejsengine";
+import {buildLevel, getCameraOffset, levelSize, playerStartPos} from "./gameLevel.ts";
+import {Player} from "./gamePlayer.ts";
+import {explosion, sound_jump} from "./gameEffects.ts";
+import {Crate, Enemy} from "./gameObjects.ts";
 
-import * as GameObjects from './gameObjects.js';
-import * as GameEffects from './gameEffects.js';
-import * as GamePlayer from './gamePlayer.js';
-import * as GameLevel from './gameLevel.js';
-import * as LJS from "littlejsengine";
-
-const {vec2} = LJS;
 
 // globals
-export let gameLevelData, spriteAtlas, player, camera, score, deaths;
+export let gameLevelData: any;
+export let spriteAtlas: any;
+export let player: any;
+export let camera: any;
+export let score: any;
+export let deaths: any;
 
 export function addToScore(delta = 1) {
     score += delta;
@@ -24,46 +48,44 @@ export function addToDeaths() {
 }
 
 // enable touch gamepad on touch devices
-LJS.setTouchGamepadEnable(true);
+setTouchGamepadEnable(true);
 
 // limit canvas aspect ratios to support most modern HD devices
-LJS.setCanvasMinAspect(.4);
-LJS.setCanvasMaxAspect(2.5);
-
+setCanvasMinAspect(.4);
+setCanvasMaxAspect(2.5);
 
 function loadLevel() {
     // setup level
-    GameLevel.buildLevel();
+    buildLevel();
 
     // spawn player
-    player = new GamePlayer.Player(GameLevel.playerStartPos);
+    player = new Player(playerStartPos);
 
     // the camera follows the player, showing more of the way it runs, and keeps the view over the level
-    camera = new LJS.FollowCamera(player, .15);
-    camera.offset = GameLevel.getCameraOffset();
+    camera = new FollowCamera(player, .15);
+    camera.offset = getCameraOffset();
     camera.deadZone = vec2(1, 3);
     camera.lookAhead = vec2(3, 0);
     camera.boundsMin = vec2();
-    camera.boundsMax = vec2(GameLevel.levelSize.x, Infinity);
+    camera.boundsMax = vec2(levelSize.x, Infinity);
     camera.snap();
 
     // init game
     score = deaths = 0;
 }
 
-
 async function gameInit() {
     // load the game level data
-    gameLevelData = await LJS.fetchJSON('gameLevelData.json');
+    gameLevelData = await fetchJSON('gameLevelData.json');
 
     // engine settings
-    LJS.setGravity(vec2(0, -.01));
-    LJS.setObjectDefaultDamping(.99);
-    LJS.setObjectDefaultAngleDamping(.99);
-    LJS.setCameraScale(4 * 16);
+    setGravity(vec2(0, -.01));
+    setObjectDefaultDamping(.99);
+    setObjectDefaultAngleDamping(.99);
+    setCameraScale(4 * 16);
 
     // create a table of all sprites
-    const gameTile = (i, size = 16) => LJS.tile(i, size, 0, 1);
+    const gameTile = (i: any, size: number = 16) => tile(i, size, 0, 1);
     spriteAtlas =
         {
             // large tiles
@@ -82,61 +104,57 @@ async function gameInit() {
 
     // the level editor's Restart button (Esc then 0) rebuilds the level with its changes, and its Play from mouse
     // puts the player where the mouse is
-    LJS.levelEditor.onRestart = loadLevel;
-    LJS.levelEditor.onPlayFrom = (pos) => {
+    levelEditor.onRestart = loadLevel;
+    levelEditor.onPlayFrom = (pos) => {
         player.pos = pos.copy();
         player.velocity = vec2();
     };
 }
 
-
 function gameUpdate() {
     // respawn player
     if (player.deadTimer > 1) {
-        player = new GamePlayer.Player(GameLevel.playerStartPos);
+        player = new Player(playerStartPos);
         player.velocity = vec2(0, .1);
-        GameEffects.sound_jump.play();
+        sound_jump.play();
         camera.target = player;
     }
 
     // mouse wheel = zoom, the camera keeps the player the same height above the middle of the view
-    LJS.setCameraScale(LJS.clamp(LJS.cameraScale * (1 - LJS.mouseWheel / 10), 1, 1e3));
-    camera.offset = GameLevel.getCameraOffset();
+    setCameraScale(clamp(cameraScale * (1 - mouseWheel / 10), 1, 1e3));
+    camera.offset = getCameraOffset();
 
     // T = drop test crate
-    if (LJS.keyWasPressed('KeyT'))
-        new GameObjects.Crate(LJS.mousePos);
+    if (keyWasPressed('KeyT'))
+        new Crate(mousePos);
 
     // E = drop enemy
-    if (LJS.keyWasPressed('KeyE'))
-        new GameObjects.Enemy(LJS.mousePos);
+    if (keyWasPressed('KeyE'))
+        new Enemy(mousePos);
 
     // B = make explosion
-    if (LJS.keyWasPressed('KeyB'))
-        GameEffects.explosion(LJS.mousePos);
+    if (keyWasPressed('KeyB'))
+        explosion(mousePos);
 
     // M = move player to mouse
-    if (LJS.keyWasPressed('KeyM'))
-        player.pos = LJS.mousePos.copy();
+    if (keyWasPressed('KeyM'))
+        player.pos = mousePos.copy();
 
     // R = restart level
-    if (LJS.keyWasPressed('KeyR'))
+    if (keyWasPressed('KeyR'))
         loadLevel();
 }
-
 
 function gameUpdatePost() {
 }
 
-
 function gameRender() {
 }
 
-
 function gameRenderPost() {
     // draw to main canvas for hud rendering
-    const drawText = (text, x, y, size = 40) => {
-        const context = LJS.mainContext;
+    const drawText = (text: any, x: any, y: any, size: number = 40) => {
+        const context = mainContext;
         context.textAlign = 'center';
         context.textBaseline = 'top';
         context.font = size + 'px arial';
@@ -145,10 +163,9 @@ function gameRenderPost() {
         context.strokeText(text, x, y);
         context.fillText(text, x, y);
     }
-    drawText('Score: ' + score, LJS.mainCanvasSize.x / 4, 20);
-    drawText('Deaths: ' + deaths, LJS.mainCanvasSize.x * 3 / 4, 20);
+    drawText('Score: ' + score, mainCanvasSize.x / 4, 20);
+    drawText('Deaths: ' + deaths, mainCanvasSize.x * 3 / 4, 20);
 }
 
-
 // Starting up the engine
-LJS.engineInit(gameInit, gameUpdate, gameUpdatePost, gameRender, gameRenderPost, ['tiles.png', 'tilesLevel.png']);
+engineInit(gameInit, gameUpdate, gameUpdatePost, gameRender, gameRenderPost, ['tiles.png', 'tilesLevel.png']);
