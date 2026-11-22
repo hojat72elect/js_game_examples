@@ -1,9 +1,7 @@
 /**
  * A simple JavaScript 3D game with the help of Three.js framework.
  */
-// @ts-ignore
 import * as THREE from 'three';
-
 import {
     drawTextScreen,
     engineInit,
@@ -14,7 +12,6 @@ import {
     ThreeJSPlugin,
     vec2
 } from "littlejsengine";
-
 
 // platforming constants
 const zGravity = .012;     // fall acceleration per update
@@ -226,9 +223,11 @@ function gameUpdate() {
     camera.lookAt(player.pos.x, player.pos.y, player.zPos + 1);
 }
 
-function gameUpdatePost() {}
+function gameUpdatePost() {
+}
 
-function gameRender() {}
+function gameRender() {
+}
 
 function gameRenderPost() {
     // 2D hud text always renders on top
