@@ -1,4 +1,5 @@
 /*
+    **Do not migrate this example to TypeScript.**
     LittleJS Particle Designer: page helpers
     - Effects, settings, behaviors and presets come from the particle
       effects plugin, the same ones a game plays

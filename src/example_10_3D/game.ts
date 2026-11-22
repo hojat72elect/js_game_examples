@@ -1,20 +1,20 @@
-/*
-    LittleJS Three.js Platformer Example
-    - A tiny 3D platformer driven entirely by LittleJS game logic
-    - Uses the three.js plugin with a free camera (cameraAlign2D disabled)
-    - LittleJS XY is the ground plane and z is height above the ground
-    - LittleJS handles input, physics, and collision on the ground plane
-    - Objects track zPos and zVelocity for jumping with manual gravity
-    - The LittleJS canvas on top only draws HUD text
-    - Controls: arrows or WASD to run, space to jump
-*/
-
-'use strict';
-
+/**
+ * A simple JavaScript 3D game with the help of Three.js framework.
+ */
+// @ts-ignore
 import * as THREE from 'three';
-import * as LJS from "littlejsengine";
 
-const {vec2} = LJS;
+import {
+    drawTextScreen,
+    engineInit,
+    keyDirection,
+    keyWasPressed,
+    mainCanvasSize,
+    ThreeJSObject,
+    ThreeJSPlugin,
+    vec2
+} from "littlejsengine";
+
 
 // platforming constants
 const zGravity = .012;     // fall acceleration per update
@@ -26,15 +26,20 @@ const cameraOffset = new THREE.Vector3(0, -9, 6); // fixed follow offset
 const cameraLerp = .1; // camera smoothing per update
 
 // game globals
-let player, threeJS;
-const platforms = [];
+let player: any;
+let threeJS: any;
+const platforms: any[] = [];
 let coinsCollected = 0, coinsTotal = 0;
 
-///////////////////////////////////////////////////////////////////////////////
 // engine objects with height physics for jumping and landing
 
-class PlatformerObject extends LJS.ThreeJSObject {
-    constructor(pos, size, mesh, zPos = 0) {
+class PlatformerObject extends ThreeJSObject {
+
+    meshZOffset;
+    zPos;
+    zVelocity;
+
+    constructor(pos: any, size: any, mesh: any, zPos: number = 0) {
         super(pos, size, mesh, zPos);
         this.meshZOffset = 0;  // lift for meshes with centered pivots
         this.zPos = zPos;      // height of the object base above the ground
@@ -83,7 +88,10 @@ class PlatformerObject extends LJS.ThreeJSObject {
 
 // static box that can be walked into, jumped over, and stood on
 class Platform extends PlatformerObject {
-    constructor(pos, size, height, color) {
+
+    height;
+
+    constructor(pos: any, size: any, height: any, color: any) {
         const geometry = new THREE.BoxGeometry(size.x, size.y, height);
         const material = new THREE.MeshStandardMaterial({color});
         super(pos, size, new THREE.Mesh(geometry, material));
@@ -97,7 +105,7 @@ class Platform extends PlatformerObject {
 
 // spinning collectible, destroying it removes the mesh from the scene
 class Coin extends PlatformerObject {
-    constructor(pos, zPos) {
+    constructor(pos: any, zPos: any) {
         // tilt the ring upright inside a group so the spin stays around world z
         const geometry = new THREE.TorusGeometry(.3, .1, 12, 24);
         const material = new THREE.MeshStandardMaterial({color: 0xffcc00});
@@ -125,7 +133,7 @@ class Coin extends PlatformerObject {
 
 // player cube, littlejs physics moves it and littlejs input controls it
 class Player extends PlatformerObject {
-    constructor(pos) {
+    constructor(pos: any) {
         const geometry = new THREE.BoxGeometry(.8, .8, .8);
         const material = new THREE.MeshStandardMaterial({color: 0xff8822, roughness: .4});
         super(pos, vec2(.8), new THREE.Mesh(geometry, material));
@@ -136,17 +144,17 @@ class Player extends PlatformerObject {
 
     update() {
         // run with arrows or wasd
-        this.velocity = this.velocity.add(LJS.keyDirection().scale(.015));
+        this.velocity = this.velocity.add(keyDirection().scale(.015));
 
         // jump with space when standing on something
-        if (LJS.keyWasPressed('Space') && this.isOnGround())
+        if (keyWasPressed('Space') && this.isOnGround())
             this.zVelocity = jumpVelocity;
 
         this.applyZGravity();
         super.update();
     }
 
-    collideWithObject(other) {
+    collideWithObject(other: any) {
         // solid walls when below a platform top, pass over when above it
         if (other instanceof Platform)
             return this.zPos < other.height - groundEpsilon;
@@ -154,12 +162,12 @@ class Player extends PlatformerObject {
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
+
 // game hooks
 
 function gameInit() {
     // setup the three.js plugin with a free camera for the chase cam
-    threeJS = new LJS.ThreeJSPlugin(THREE);
+    threeJS = new ThreeJSPlugin(THREE);
     threeJS.cameraAlign2D = false; // this example drives the camera itself
     threeJS.camera.up.set(0, 0, 1); // littlejs z is up
 
@@ -218,21 +226,17 @@ function gameUpdate() {
     camera.lookAt(player.pos.x, player.pos.y, player.zPos + 1);
 }
 
-function gameUpdatePost() {
-}
+function gameUpdatePost() {}
 
-function gameRender() {
-}
+function gameRender() {}
 
 function gameRenderPost() {
     // 2D hud text always renders on top
-    const pos = vec2(LJS.mainCanvasSize.x / 2, 45);
+    const pos = vec2(mainCanvasSize.x / 2, 45);
     const done = coinsCollected === coinsTotal ? ' — You got them all!' : '';
-    LJS.drawTextScreen(`Coins: ${coinsCollected} / ${coinsTotal}${done}`, pos, 35);
-    LJS.drawTextScreen('Arrows/WASD run — Space jump', pos.add(vec2(0, 35)), 20);
+    drawTextScreen(`Coins: ${coinsCollected} / ${coinsTotal}${done}`, pos, 35);
+    drawTextScreen('Arrows/WASD run — Space jump', pos.add(vec2(0, 35)), 20);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// startup LittleJS engine
-
-LJS.engineInit(gameInit, gameUpdate, gameUpdatePost, gameRender, gameRenderPost);
+// start up the engine
+engineInit(gameInit, gameUpdate, gameUpdatePost, gameRender, gameRenderPost);
